@@ -177,7 +177,7 @@
   const daysLeft = () => SALON ? Math.ceil((new Date(SALON.prueba_hasta) - new Date()) / 864e5) : 0;
   window.planBlocked = () => !!SALON && ((SALON.estado === 'prueba' && daysLeft() <= 0) || SALON.estado === 'vencido' || SALON.estado === 'cancelado');
   window.planShort = () => !SALON ? '' : SALON.estado === 'activo' ? 'Plan Básico · activo' : SALON.estado === 'prueba' ? `Prueba gratis · ${Math.max(0, daysLeft())} ${daysLeft() === 1 ? 'día' : 'días'}` : 'Plan vencido';
-  const WA_PEINETA = '5492473000000'; // TODO: WhatsApp de Peineta para activar el plan
+  const WA_PEINETA = '5492473517947'; // WhatsApp de Peineta (provisorio)
   window.planCard = () => {
     if (!SALON) return '';
     const fin = new Date(SALON.prueba_hasta).toLocaleDateString('es-AR', { day: 'numeric', month: 'long' });
