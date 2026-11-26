@@ -13,3 +13,13 @@
   [headers.values]
     Cache-Control = "no-cache"
     Service-Worker-Allowed = "/app/"
+
+[[headers]]
+  for = "/terminos*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive"
+
+[[headers]]
+  for = "/privacidad*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow, noarchive"
