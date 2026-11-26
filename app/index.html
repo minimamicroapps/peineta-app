@@ -20,7 +20,7 @@ button{cursor:pointer;border:0;background:none}
 .app{width:100%;max-width:430px;height:100dvh;background:var(--bg);position:relative;display:flex;flex-direction:column;overflow:hidden}
 @media(min-width:600px){body{padding:28px 0;min-height:100vh}.app{height:880px;border-radius:34px;box-shadow:0 30px 80px rgba(70,30,45,.22),0 0 0 10px #fff}}
 .demo-tag{position:fixed;top:10px;left:50%;transform:translateX(-50%);background:#2B2326;color:#fff;font-size:11px;padding:4px 10px;border-radius:99px;z-index:50;opacity:.85;letter-spacing:.02em}
-@media(max-width:599px){.demo-tag{display:none}}
+@media(max-width:599px){html,body{height:100%;overflow:hidden;overscroll-behavior:none}.app{height:100vh;height:100dvh;max-width:none}.tabbar{position:fixed;z-index:40}main{-webkit-overflow-scrolling:touch;overscroll-behavior:contain}}
 main{flex:1;overflow-y:auto;padding:4px 18px 110px}
 h1,h2,.serif{font-family:'Fraunces',Georgia,serif;font-weight:600}
 h2{font-size:17px;margin:24px 0 10px;display:flex;align-items:baseline;gap:8px}
