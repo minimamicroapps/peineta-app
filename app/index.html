@@ -249,7 +249,7 @@ function tplFor(t){const e='✂️';return{
  promo:'Hola {nombre}! 👋 Esta semana tenemos 15% off en {salon}. ¿Te reservo un turno?'}}
 
 function fresh(){return{authed:false,loginStep:0,onboarded:false,obStep:0,tab:'hoy',clientId:null,cajaPer:'semana',agendaDay:0,q:'',sent:{},form:{},cf:{sex:'all',time:'all',tag:'',sort:'az'},
- settings:{type:null,salon:'',owner:'',email:'mipelu@gmail.com',brand:'#A8466B',logo:null,earnPer:100,ptValue:10,phone:'5492473400000',review:'https://g.page/r/nuevo-estilo/review',hours:{days:[1,2,3,4,5,6],open:'09:00',close:'20:00'},blocked:[],tpl:tplFor('m')},
+ settings:{type:null,salon:'',owner:'',email:'',brand:'#A8466B',logo:null,earnPer:100,ptValue:10,phone:'5492473400000',review:'https://g.page/r/nuevo-estilo/review',hours:{days:[1,2,3,4,5,6],open:'09:00',close:'20:00'},blocked:[],tpl:tplFor('m')},
  services:[],clients:[],visits:[],appts:[],products:[],points:[],expenses:[],closings:{}}}
 
 /* servicios precargados según el tipo de peluquería (todo editable después) */
@@ -692,7 +692,7 @@ function vLogin(){
   <div class="field"><label for="pw">Contraseña</label>${pw('pw','Tu contraseña')}</div>
   <div style="text-align:right;margin:-4px 0 14px"><button class="lnk" data-act="forgot">¿Olvidaste tu contraseña?</button></div>
   <button class="btn pri block" data-act="login">Ingresar</button>
-  <div class="foot">¿Todavía no tenés cuenta? <button class="lnk" data-act="signupOpen">Probá 7 días gratis</button><br>En el prototipo entra con cualquier contraseña de 8 caracteres o más.</div></div>`}
+  <div class="foot">¿Todavía no tenés cuenta? <button class="lnk" data-act="signupOpen">Probá 7 días gratis</button></div></div>`}
 
 const PRESETS=['#A8466B','#C2185B','#D9776A','#B0743C','#7B4BA8','#1F4E5F','#2F6F73','#3B6FB6','#2B2326'];
 function pvText(t){const c=S.clients[0]||{name:'Laura'};const x=activeSvcs().find(s=>s.cycle)||{name:'corte',cycle:30};return fill(t,{...tplVars(c),tiempo:span(x.cycle),servicio:x.name.toLowerCase()})}
@@ -834,7 +834,7 @@ function exportSets(){return{
 function sheetExport(){const f=S.form;return`<h3>Descargar mis datos</h3>
  <p class="note" style="margin:-6px 0 12px">Tus datos son tuyos. Bajalos cuando quieras para tener una copia o usarlos en Excel.</p>
  ${[['clientes','👥 Clientes'],['visitas','✂️ Visitas y ventas'],['productos','🧴 Productos'],['gastos','➖ Gastos']].map(([k,l])=>`<button class="imp" data-act="expDo" data-v="${k}"><span>${l.split(' ')[0]}</span><div><b>${l.slice(l.indexOf(' ')+1)}</b><small>${exportSets()[k]().length-1} filas</small></div></button>`).join('')}
- <p class="note">En la app real se descarga un archivo de Excel. En este prototipo se copia la tabla: pegala en Excel o Google Sheets y queda en columnas.</p>
+ <p class="note">Se copia la tabla: pegala en Excel o Google Sheets y queda en columnas.</p>
  ${f.fallback?`<textarea class="inp" style="min-height:120px;margin-top:10px;font-size:11px" readonly>${esc(f.fallback)}</textarea>`:''}
  <button class="btn block" style="margin-top:8px;color:var(--muted)" data-act="close">Cerrar</button>`}
 /* ---------- sheets ---------- */
