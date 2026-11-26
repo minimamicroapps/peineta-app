@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Peineta · La app para peluquerías y barberías</title>
+<meta name="description" content="Peineta ordena tu peluquería y hace que tus clientes vuelvan: agenda de turnos, recordatorios por WhatsApp, clientes y caja, todo desde el celular. $15.000 por mes, 7 días gratis sin tarjeta.">
+<meta property="og:title" content="Peineta · Tu peluquería, ordenada">
+<meta property="og:description" content="La app para peluquerías y barberías: turnos, clientes y caja en un solo lugar. 7 días gratis, sin tarjeta.">
+<meta name="theme-color" content="#111111">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1468742505362288');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none" alt=""
+src="https://www.facebook.com/tr?id=1468742505362288&ev=PageView&noscript=1"></noscript>
+<!-- End Meta Pixel Code -->
+
+<style>
+:root{--k:#111111;--b:#EFE4D2;--o:#FF5A3C;--w:#fff;--g:#6b625a;--line:#e3d6c1}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,system-ui,sans-serif;color:var(--k);background:var(--b);-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:Sora,sans-serif;letter-spacing:-.025em;margin:0}
+a{color:inherit}
+.wrap{max-width:1120px;margin:0 auto;padding:0 22px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:600 17px/1 Inter,sans-serif;padding:17px 26px;border-radius:14px;border:0;cursor:pointer;text-decoration:none;transition:transform .15s,box-shadow .15s}
+.btn:hover{transform:translateY(-1px)}
+.btn:focus-visible{outline:3px solid var(--o);outline-offset:3px}
+.btn-o{background:var(--o);color:var(--k);box-shadow:0 6px 0 #c9432a}
+.btn-o:active{transform:translateY(3px);box-shadow:0 3px 0 #c9432a}
+.btn-ghost{background:transparent;color:var(--b);border:1.5px solid #3a3a3a}
+
+/* nav */
+nav{position:sticky;top:0;z-index:20;background:rgba(17,17,17,.92);backdrop-filter:blur(8px);color:var(--b)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font:700 24px/1 Sora,sans-serif;letter-spacing:-.02em;color:var(--b)}
+nav .btn{padding:11px 16px;font-size:15px;box-shadow:none}
+
+/* hero */
+.hero{background:var(--k);color:var(--b);position:relative;overflow:hidden;padding:56px 0 80px}
+.teeth{position:absolute;right:-30px;top:20px;display:flex;flex-direction:column;gap:22px;opacity:.16}
+.teeth i{display:block;width:130px;height:9px;border-radius:5px;background:var(--o)}
+.hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center;position:relative}
+.pill{display:inline-block;background:#262626;color:var(--o);font-weight:600;font-size:14px;padding:8px 14px;border-radius:999px;margin-bottom:22px}
+.hero h1{font-size:clamp(36px,5vw,58px);line-height:1.04}
+.hero h1 em{font-style:normal;color:var(--o)}
+.hero p.lead{font-size:clamp(18px,2vw,21px);line-height:1.5;color:#d9cfbf;max-width:520px;margin:22px 0 30px}
+.cta-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+.small{font-size:14px;color:#a99f90;margin-top:16px}
+
+/* phone */
+.phone{width:300px;max-width:100%;margin:0 auto;background:#000;border-radius:44px;padding:12px;box-shadow:0 30px 80px rgba(0,0,0,.5),0 0 0 2px #2a2a2a;transform:rotate(2.5deg)}
+.screen{background:#faf7f2;border-radius:34px;overflow:hidden;color:var(--k);font-size:13px}
+.sc-top{background:var(--k);color:var(--b);padding:22px 18px 16px}
+.sc-top small{color:#a99f90;font-size:12px}
+.sc-top b{display:block;font:700 20px Sora,sans-serif;margin-top:4px}
+.sc-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px}
+.st{background:#fff;border:1px solid #eee3d3;border-radius:14px;padding:10px}
+.st span{display:block;font-size:11px;color:var(--g)}
+.st b{font:700 18px Sora,sans-serif}
+.sc-h{padding:4px 14px 6px;font-weight:700;font-size:12px;color:var(--g);text-transform:uppercase;letter-spacing:.04em}
+.cl{display:flex;align-items:center;gap:10px;background:#fff;margin:0 12px 8px;border:1px solid #eee3d3;border-radius:14px;padding:10px}
+.av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:12px;background:#ffe1d9;color:#b23a22;flex:none}
+.cl div{flex:1;min-width:0}
+.cl b{display:block;font-size:13px}
+.cl small{color:var(--g);font-size:11px}
+.wa{background:#25D366;color:#fff;font-weight:700;font-size:11px;padding:7px 10px;border-radius:9px}
+.sc-pad{height:14px}
+.alert{margin:12px 12px 4px;background:#fff1ec;border:1px solid #ffc9ba;color:#b23a22;font-weight:700;font-size:12px;padding:9px 11px;border-radius:12px}
+.tm{font:700 13px Sora,sans-serif;width:42px;flex:none;color:var(--k)}
+.ck{font-size:11px;font-weight:700;color:#1a7f45;background:#e3f6ea;padding:6px 9px;border-radius:9px}
+.cl.now{border-color:var(--o);box-shadow:0 0 0 2px #ffd9cf}
+.cl.free{background:transparent;border-style:dashed}
+.cl.free b{color:var(--g)}
+.plus{width:28px;height:28px;border-radius:9px;background:var(--k);color:var(--b);display:grid;place-items:center;font-weight:700}
+
+/* sections */
+section{padding:84px 0}
+.eyebrow{font-weight:700;color:var(--o);font-size:14px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
+h2{font-size:clamp(32px,4.4vw,48px);line-height:1.06;max-width:760px}
+.sub{font-size:19px;line-height:1.55;color:var(--g);max-width:640px;margin:18px 0 0}
+
+.pain{background:var(--b)}
+.pain-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:44px}
+.pain-card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:26px}
+.pain-card .n{font:800 44px Sora,sans-serif;color:var(--o);line-height:1}
+.pain-card p{margin:10px 0 0;font-size:17px;line-height:1.5}
+
+.feat{background:#fff}
+.back{background:var(--b)}
+.f-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:44px}
+.f{border:1px solid var(--line);border-radius:22px;padding:26px;background:#fcfaf6}
+.ic{width:48px;height:48px;border-radius:14px;background:var(--k);display:grid;place-items:center;margin-bottom:16px}
+.ic svg{width:24px;height:24px;stroke:var(--o);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.f h3{font-size:21px;margin-bottom:8px}
+.f p{margin:0;color:var(--g);line-height:1.5;font-size:16px}
+
+.how{background:var(--k);color:var(--b)}
+.how .sub{color:#c9bfaf}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:44px;counter-reset:s}
+.step{border:1px solid #2e2e2e;border-radius:22px;padding:28px;background:#181818}
+.step::before{counter-increment:s;content:counter(s);display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--o);color:var(--k);font:800 20px Sora,sans-serif;margin-bottom:18px}
+.step h3{font-size:21px;margin-bottom:8px}
+.step p{margin:0;color:#c9bfaf;line-height:1.5}
+
+.price{background:var(--b)}
+.price .wrap{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.card{background:var(--k);color:var(--b);border-radius:28px;padding:36px;position:relative;overflow:hidden}
+.card .tag{display:inline-block;background:var(--o);color:var(--k);font-weight:700;font-size:13px;padding:6px 12px;border-radius:999px}
+.amount{font:800 64px Sora,sans-serif;letter-spacing:-.03em;margin:18px 0 0;line-height:1}
+.amount small{font:600 20px Inter,sans-serif;color:#a99f90;letter-spacing:0}
+.card ul{list-style:none;padding:0;margin:24px 0 28px;display:grid;gap:12px}
+.card li{display:flex;gap:10px;align-items:flex-start;font-size:16px}
+.card li::before{content:"";flex:none;width:20px;height:20px;border-radius:50%;background:var(--o) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E") center/12px no-repeat;margin-top:1px}
+
+.faq{background:#fff}
+.faq .wrap{max-width:820px}
+details{border-bottom:1px solid var(--line);padding:20px 0}
+summary{cursor:pointer;font:700 19px Sora,sans-serif;list-style:none;display:flex;justify-content:space-between;gap:16px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--o);font-size:26px;line-height:1}
+details[open] summary::after{content:"–"}
+details p{margin:12px 0 0;color:var(--g);line-height:1.6;font-size:17px}
+
+.join{background:var(--o)}
+.join .wrap{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.join h2{color:var(--k)}
+.join .sub{color:#3a1a12}
+form{background:var(--k);border-radius:28px;padding:30px;display:grid;gap:14px;color:var(--b)}
+label{display:grid;gap:7px;font-weight:600;font-size:15px}
+input,select{font:500 17px Inter,sans-serif;padding:15px 16px;border-radius:12px;border:1.5px solid #333;background:#1c1c1c;color:var(--w);width:100%}
+input::placeholder{color:#7a7268}
+input:focus,select:focus{outline:none;border-color:var(--o)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ok{display:none;text-align:center;padding:20px 6px}
+.ok h3{font-size:26px;margin:10px 0 8px}
+.ok p{color:#c9bfaf;margin:0;line-height:1.5}
+.err{color:#ff8f7a;font-size:14px;min-height:1em;margin:0}
+.legal{font-size:12.5px;color:#8f877c;margin:0;line-height:1.5}
+
+footer{background:var(--k);color:#8f877c;padding:40px 0;font-size:14px}
+footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+
+@media (max-width:860px){
+  .hero .wrap,.price .wrap,.join .wrap{grid-template-columns:1fr}
+  .pain-grid,.f-grid,.steps{grid-template-columns:1fr}
+  .phone{transform:none;margin-top:20px}
+  section{padding:64px 0}
+  .row2{grid-template-columns:1fr}
+  .teeth{display:none}
+  .hero{padding:40px 0 64px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<div style="background:#000;color:#a99f90;font-size:12.5px;text-align:right;padding:6px 22px"><a href="/arrepentimiento.html" style="color:#EFE4D2;text-decoration:underline">Botón de arrepentimiento</a> · <a href="/arrepentimiento.html#baja" style="color:#EFE4D2;text-decoration:underline">Botón de baja de servicio</a></div>
+<nav aria-label="Principal">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Peineta, inicio">
+      <svg width="30" height="38" viewBox="34 16 132 168" aria-hidden="true"><g fill="#FF5A3C"><rect x="44" y="30" width="40" height="6.2" rx="3.1"/><rect x="44" y="42.2" width="40" height="6.2" rx="3.1"/><rect x="44" y="54.4" width="40" height="6.2" rx="3.1"/><rect x="44" y="66.6" width="40" height="6.2" rx="3.1"/><rect x="44" y="78.8" width="40" height="6.2" rx="3.1"/><rect x="44" y="91" width="40" height="6.2" rx="3.1"/><rect x="44" y="103.2" width="40" height="6.2" rx="3.1"/><rect x="44" y="115.4" width="40" height="6.2" rx="3.1"/><rect x="44" y="127.6" width="40" height="6.2" rx="3.1"/><rect x="44" y="139.8" width="40" height="6.2" rx="3.1"/><rect x="44" y="152" width="40" height="6.2" rx="3.1"/><rect x="44" y="164.2" width="40" height="6.2" rx="3.1"/></g><rect x="78" y="26" width="26" height="148" rx="5" fill="#EFE4D2"/><path d="M90 41 H118 A35 35 0 0 1 118 111 H90" fill="none" stroke="#EFE4D2" stroke-width="28"/></svg>
+      peineta
+    </a>
+    <a class="btn btn-o" href="#anotate">Quiero probarla</a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="teeth" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="wrap">
+    <div>
+      <span class="pill">Para peluquerías y barberías · Muy pronto</span>
+      <h1>Tu peluquería ordenada. <em>Tus clientes, de vuelta.</em></h1>
+      <p class="lead">Turnos, clientes y caja en un solo lugar, desde el celular: chau cuaderno y chau buscar turnos entre mil chats. Y Peineta te avisa a quién recordarle el turno y a quién le toca volver, para que le escribas por WhatsApp con un toque.</p>
+      <div class="cta-row">
+        <a class="btn btn-o" href="#anotate">Anotarme para probarla gratis</a>
+        <a class="btn btn-ghost" href="#como-funciona">Cómo funciona</a>
+      </div>
+      <p class="small">7 días gratis · Sin tarjeta · Después $15.000 por mes</p>
+    </div>
+    <div class="phone" role="img" aria-label="Pantalla de Peineta con la agenda de turnos del día">
+      <div class="screen">
+        <div class="sc-top"><small>Martes 24 · 9 turnos</small><b>Agenda de hoy</b></div>
+        <div class="alert">💬 3 clientes para escribir hoy</div>
+        <div class="sc-h">Mañana</div>
+        <div class="cl"><span class="tm">9:00</span><div><b>Martín A.</b><small>Corte · 30 min</small></div><span class="ck">Vino</span></div>
+        <div class="cl"><span class="tm">9:30</span><div><b>Carolina R.</b><small>Color + brushing · 2 h</small></div><span class="ck">Vino</span></div>
+        <div class="cl now"><span class="tm">11:30</span><div><b>Lucía F.</b><small>Corte · 45 min</small></div><span class="wa">Recordar</span></div>
+        <div class="sc-h">Tarde</div>
+        <div class="cl"><span class="tm">15:00</span><div><b>Tomás G.</b><small>Corte + barba · 45 min</small></div><span class="wa">Recordar</span></div>
+        <div class="cl free"><span class="tm">16:00</span><div><b>Libre</b><small>Tocá para dar un turno</small></div><span class="plus">+</span></div>
+        <div class="sc-pad"></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+<section class="pain" aria-labelledby="pain-h">
+  <div class="wrap">
+    <p class="eyebrow">¿Te suena?</p>
+    <h2 id="pain-h">Los turnos en un cuaderno, en WhatsApp y en tu cabeza.</h2>
+    <p class="sub">Cuando atendés vos sola o con poca gente, no hay tiempo para ordenar nada. Y se nota: turnos que se pisan, clientes que se olvidan y una caja que nunca cierra.</p>
+    <div class="pain-grid">
+      <div class="pain-card"><div class="n">Antes</div><p>Buscás en el chat a qué hora venía cada uno, anotás en un cuaderno y rezás para que no se te cruce un turno.</p></div>
+      <div class="pain-card"><div class="n">Con Peineta</div><p>Abrís el celular y ves tu día entero: quién viene, a qué hora, qué se hace y cuánto tiempo lleva.</p></div>
+      <div class="pain-card"><div class="n">1 toque</div><p>Para recordarle el turno a tu cliente por WhatsApp, con el mensaje ya escrito. Menos faltazos, menos huecos.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="feat" aria-labelledby="feat-h">
+  <div class="wrap">
+    <p class="eyebrow">Qué hace Peineta</p>
+    <h2 id="feat-h">Todo tu día de trabajo en un solo lugar.</h2>
+    <p class="sub">Simple a propósito: si sabés usar WhatsApp, sabés usar Peineta.</p>
+    <div class="f-grid">
+      <div class="f"><div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18"/></svg></div><h3>Agenda y turnos</h3><p>Tu calendario de turnos por día y por semana. Turnos fijos, duración de cada servicio, tu horario de atención y tus días libres. Sin turnos pisados.</p></div>
+      <div class="f"><div class="ic"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-12.6 7.3L3 20.5l1.7-5.2A8.4 8.4 0 1 1 21 11.5z"/></svg></div><h3>Recordatorios por WhatsApp</h3><p>Le recordás el turno a cada cliente con un toque: el mensaje ya está escrito y sale de tu número. Y si alguien hace mucho que no viene, también te avisa.</p></div>
+      <div class="f"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-7 7-7s7 3 7 7M17 4a4 4 0 0 1 0 8M22 21c0-3-1.5-5.5-4-6.5"/></svg></div><h3>Tus clientes, ordenados</h3><p>Teléfono, qué se hizo la última vez, cuánto pagó y cuándo vino. Importás tus contactos en un minuto. Para salones de mujeres, de hombres o unisex.</p></div>
+      <div class="f"><div class="ic"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="13" rx="2"/><circle cx="12" cy="12.5" r="3"/><path d="M6 6V4h12v2"/></svg></div><h3>Caja del día</h3><p>Cobrás y queda anotado: efectivo, transferencia o Mercado Pago. Sumás tus gastos y al final del día sabés lo que te quedó.</p></div>
+      <div class="f"><div class="ic"><svg viewBox="0 0 24 24"><path d="M6 2h12l2 6H4z"/><path d="M4 8v13h16V8M10 12h4"/></svg></div><h3>Servicios y productos</h3><p>Tus servicios con su precio y duración, y tus productos con foto y stock que se descuenta solo cuando vendés.</p></div>
+      <div class="f"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 2l3 6.5 7 .8-5.2 4.7 1.5 7L12 17.5 5.7 21l1.5-7L2 9.3l7-.8z"/></svg></div><h3>Puntos y premios</h3><p>Tus clientes suman puntos con cada visita y los canjean por premios que elegís vos. Ven sus puntos desde su propio link.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="back" aria-labelledby="back-h">
+  <div class="wrap">
+    <p class="eyebrow">Y además, que vuelvan</p>
+    <h2 id="back-h">Tus clientes no se van porque no les gustó. Se olvidan.</h2>
+    <p class="sub">Peineta se acuerda por vos. Cada mañana te muestra a quién escribirle, con el mensaje de WhatsApp ya listo.</p>
+    <div class="pain-grid">
+      <div class="pain-card"><div class="n">Mañana</div><p><b>Recordatorio del turno.</b> Le avisás a quien viene mañana y confirma. Menos faltazos, menos huecos en la agenda.</p></div>
+      <div class="pain-card"><div class="n">4 sem.</div><p><b>Aviso de vuelta.</b> Cuando a un cliente le toca volver según su servicio, aparece en tu lista para escribirle.</p></div>
+      <div class="pain-card"><div class="n">⭐ Puntos</div><p><b>Un motivo más para elegirte.</b> Cada visita suma puntos que canjea por premios que elegís vos.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="how" id="como-funciona" aria-labelledby="how-h">
+  <div class="wrap">
+    <p class="eyebrow">Cómo funciona</p>
+    <h2 id="how-h">Lo empezás a usar hoy, sin instalar nada raro.</h2>
+    <p class="sub">Peineta funciona desde el navegador del celular o la compu. La agregás a tu pantalla de inicio y queda como una app.</p>
+    <div class="steps">
+      <div class="step"><h3>Creás tu cuenta</h3><p>Con tu mail y una contraseña. Cargás el nombre de tu salón, tu logo y tus colores.</p></div>
+      <div class="step"><h3>Cargás tus servicios y clientes</h3><p>Pegás tu lista de contactos o la importás de Excel. Ponés tus servicios con su precio y cuánto tardan.</p></div>
+      <div class="step"><h3>Das turnos y listo</h3><p>Cada mañana ves tu agenda, recordás los turnos con un toque y cobrás desde el mismo lugar. Vos solo atendés.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="price" aria-labelledby="price-h">
+  <div class="wrap">
+    <div>
+      <p class="eyebrow">Precio</p>
+      <h2 id="price-h">Lo mismo que sale un corte, una vez por mes.</h2>
+      <p class="sub">Con que evites un turno perdido o vuelva un cliente que se había olvidado, Peineta ya se pagó. Sin contratos: la cancelás cuando quieras.</p>
+    </div>
+    <div class="card">
+      <span class="tag">7 días gratis · Sin tarjeta</span>
+      <p class="amount">$15.000 <small>/ mes</small></p>
+      <ul>
+        <li>Agenda de turnos, turnos fijos y días libres</li>
+        <li>Recordatorios por WhatsApp ilimitados</li>
+        <li>Clientes con su historial</li>
+        <li>Caja, gastos, productos y stock</li>
+        <li>Puntos y premios para tus clientes</li>
+        <li>Tu logo y tus colores</li>
+        <li>Tus datos son tuyos: los descargás cuando quieras</li>
+      </ul>
+      <a class="btn btn-o" href="#anotate" style="width:100%">Anotarme para probarla</a>
+    </div>
+  </div>
+</section>
+
+<section class="faq" aria-labelledby="faq-h">
+  <div class="wrap">
+    <p class="eyebrow">Preguntas frecuentes</p>
+    <h2 id="faq-h">Lo que nos preguntan siempre</h2>
+    <div style="margin-top:28px">
+      <details><summary>¿Es difícil de usar?</summary><p>No. Está pensada para usarla entre cliente y cliente, desde el celular. Si sabés usar WhatsApp, en 10 minutos la tenés andando.</p></details>
+      <details><summary>¿Tengo que pagar algo para probarla?</summary><p>No. Tenés 7 días gratis y no te pedimos tarjeta. Si te sirve, después la pagás por mes con Mercado Pago.</p></details>
+      <details><summary>¿Los mensajes de WhatsApp se mandan solos?</summary><p>No, y es a propósito. Peineta te deja el mensaje listo y vos lo mandás desde tu WhatsApp con un toque. Así sale de tu número, como siempre, y no corrés riesgo de que te bloqueen.</p></details>
+      <details><summary>¿Sirve para barberías y para peluquerías de mujeres?</summary><p>Sí. Es unisex: vos cargás tus propios servicios, precios y tiempos, y podés filtrar tus clientes por mujer u hombre.</p></details>
+      <details><summary>¿Necesito una computadora?</summary><p>No. Está pensada para usarla desde el celular. Si tenés compu, también funciona ahí.</p></details>
+      <details><summary>¿Qué pasa con mis datos si dejo de usarla?</summary><p>Tus datos son tuyos. Los podés descargar en cualquier momento, y nadie más que vos ve tus clientes.</p></details>
+      <details><summary>¿Cuándo sale?</summary><p>Muy pronto. Si te anotás, te avisamos antes que a nadie y sos de los primeros en probarla.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="join" id="anotate" aria-labelledby="join-h">
+  <div class="wrap">
+    <div>
+      <h2 id="join-h">Ordená tu peluquería y que tus clientes vuelvan. Anotate.</h2>
+      <p class="sub">Te escribimos por WhatsApp el día que abrimos.</p>
+    </div>
+    <form id="f" novalidate>
+      <div class="ok" id="ok" role="status" aria-live="polite">
+        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#FF5A3C" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M7 12.5l3.2 3.2L17 9"/></svg>
+        <h3>¡Listo, ya estás anotado!</h3>
+        <p>Te vamos a escribir por WhatsApp cuando Peineta esté lista. Mientras tanto, seguinos en Instagram: <a href="https://instagram.com/peineta.app" style="color:#FF5A3C">@peineta.app</a></p>
+      </div>
+      <div id="fields" style="display:grid;gap:14px">
+        <label>Tu nombre<input name="nombre" autocomplete="name" placeholder="Ej: Lola Pérez" required></label>
+        <label>Nombre de tu peluquería<input name="salon" autocomplete="organization" placeholder="Ej: Estudio Lola" required></label>
+        <div class="row2">
+          <label>WhatsApp<input name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" placeholder="Ej: 2473 123456" required></label>
+          <label>Ciudad<input name="ciudad" autocomplete="address-level2" placeholder="Ej: Colón" required></label>
+        </div>
+        <label>Tipo de salón
+          <select name="tipo">
+            <option value="unisex">Unisex</option>
+            <option value="mujeres">Peluquería de mujeres</option>
+            <option value="barberia">Barbería</option>
+          </select>
+        </label>
+        <p class="err" id="err" role="alert"></p>
+        <button class="btn btn-o" type="submit" id="send">Anotarme</button>
+        <p class="legal">Usamos tus datos solo para avisarte del lanzamiento de Peineta. No los vendemos ni los compartimos. <a href="/privacidad.html" style="color:#a99f90">Política de privacidad</a>.</p>
+      </div>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap" style="display:block">
+    <p style="margin:0 0 10px;display:flex;flex-wrap:wrap;gap:8px 18px">
+      <a href="/arrepentimiento.html" style="color:#EFE4D2;font-weight:600">Botón de arrepentimiento</a>
+      <a href="/arrepentimiento.html#baja" style="color:#EFE4D2;font-weight:600">Botón de baja de servicio</a>
+      <a href="/terminos.html">Términos y condiciones</a>
+      <a href="/privacidad.html">Privacidad</a>
+      <a href="https://instagram.com/peineta.app">Instagram @peineta.app</a>
+    </p>
+    <p style="margin:0">© 2026 Peineta · Hecho en Argentina · Atención: lunes a viernes de 9 a 17 h · <a href="mailto:minima.microapps@gmail.com">minima.microapps@gmail.com</a></p>
+  </div>
+</footer>
+
+<script>
+// Para conectar la lista de espera: completar con la URL y la clave pública del proyecto de Supabase de Peineta.
+const SUPABASE_URL = 'https://hiejcxcvwgailprvxmtt.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_7sCjiK7hc-RceSskMVUPkA_ydagCYbp';
+
+const f = document.getElementById('f');
+f.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const err = document.getElementById('err'), btn = document.getElementById('send');
+  const d = Object.fromEntries(new FormData(f));
+  for (const k of ['nombre','salon','whatsapp','ciudad']) {
+    if (!String(d[k]||'').trim()) { err.textContent = 'Completá todos los campos, así te podemos avisar.'; f.elements[k].focus(); return; }
+  }
+  if (String(d.whatsapp).replace(/\D/g,'').length < 8) { err.textContent = 'Revisá el número de WhatsApp.'; f.elements.whatsapp.focus(); return; }
+  err.textContent = ''; btn.disabled = true; btn.textContent = 'Enviando…';
+  try {
+    if (SUPABASE_URL) {
+      const r = await fetch(SUPABASE_URL + '/rest/v1/lista_espera', {
+        method: 'POST',
+        headers: { apikey: SUPABASE_KEY, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+        body: JSON.stringify({ ...d, origen: (location.search || '').slice(0, 300) || null })
+      });
+      if (!r.ok) throw new Error(r.status);
+    }
+    if (window.fbq) fbq('track', 'Lead', { content_name: 'lista_espera' });
+    document.getElementById('fields').style.display = 'none';
+    document.getElementById('ok').style.display = 'block';
+  } catch (x) {
+    err.textContent = 'No pudimos guardar tus datos. Probá de nuevo en un ratito.';
+    btn.disabled = false; btn.textContent = 'Anotarme';
+  }
+});
+document.querySelectorAll('a[href="#anotate"]').forEach(a => a.addEventListener('click', () => { if (window.fbq) fbq('track', 'ViewContent', { content_name: 'cta_anotate' }); }));
+</script>
+</body>
+</html>

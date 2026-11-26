@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es-AR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Botón de arrepentimiento y baja · Peineta</title><meta name="robots" content="index,follow"><meta name="theme-color" content="#111111">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--k:#111;--b:#EFE4D2;--o:#FF5A3C;--g:#6b625a;--line:#e3d6c1}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;color:var(--k);background:#faf7f2;line-height:1.65;-webkit-font-smoothing:antialiased}
+nav{background:var(--k)}nav .w{display:flex;align-items:center;justify-content:space-between;height:60px}
+.brand{color:var(--b);text-decoration:none;font:700 22px Sora,sans-serif;display:flex;align-items:center;gap:9px}
+nav a.back{color:var(--b);font-size:14px;text-decoration:none;opacity:.85}
+.w{max-width:780px;margin:0 auto;padding:0 22px}
+main{padding:44px 0 70px}h1{font:700 clamp(30px,5vw,42px)/1.1 Sora,sans-serif;letter-spacing:-.02em;margin:0 0 8px}
+h2{font:700 21px Sora,sans-serif;margin:34px 0 8px;letter-spacing:-.01em}
+p,li{font-size:16.5px}.upd{color:var(--g);font-size:14px;margin-bottom:26px}
+.box{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px 24px;margin:22px 0}
+.fill{background:#fff1ec;color:#b23a22;border-radius:6px;padding:1px 6px;font-weight:600}
+a{color:#c9432a}
+footer{background:var(--k);color:#a99f90;font-size:14px;padding:30px 0}footer a{color:var(--b);margin-right:14px}
+label{display:grid;gap:6px;font-weight:600;font-size:15px}
+input,textarea,select{font:500 16px Inter,sans-serif;padding:13px 14px;border-radius:12px;border:1.5px solid #d9ccb6;background:#fff;width:100%}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--o)}
+.btn{font:600 17px Inter,sans-serif;padding:15px 22px;border-radius:14px;border:0;background:var(--o);color:var(--k);cursor:pointer}
+.btn:disabled{opacity:.6}form{display:grid;gap:14px}
+.tabs{display:flex;gap:8px;margin:18px 0}.tabs button{flex:1;font:600 15px Inter,sans-serif;padding:12px;border-radius:12px;border:1.5px solid #d9ccb6;background:#fff;cursor:pointer}
+.tabs button[aria-selected=true]{background:var(--k);color:var(--b);border-color:var(--k)}
+.code{font:700 26px Sora,sans-serif;letter-spacing:.04em;color:var(--o)}.err{color:#b23a22;min-height:1em;margin:0;font-size:14px}
+</style></head><body>
+<nav><div class="w"><a class="brand" href="/">peineta</a><a class="back" href="/">← Volver al inicio</a></div></nav>
+<main><div class="w">
+<h1>Botón de arrepentimiento y Botón de baja de servicio</h1><p class="upd">Última actualización: 26 de noviembre de 2026</p>
+<p>Desde acá podés <b>arrepentirte</b> de una contratación hecha en los últimos 10 días corridos, o <b>dar de baja</b> el servicio en cualquier momento. No necesitás iniciar sesión ni registrarte. Al enviar el pedido te mostramos tu <b>código de trámite</b> y te lo confirmamos por mail dentro de las 24 horas.</p>
+<div class="tabs" role="tablist">
+ <button type="button" role="tab" id="t-arr" aria-selected="true" onclick="sel('arrepentimiento')">Botón de arrepentimiento</button>
+ <button type="button" role="tab" id="t-baja" aria-selected="false" onclick="sel('baja')">Botón de baja de servicio</button>
+</div>
+<div class="box">
+<p id="desc" style="margin-top:0"></p>
+<form id="f" novalidate>
+ <label>Nombre y apellido<input name="nombre" autocomplete="name" required></label>
+ <label>Mail (te mandamos la confirmación acá)<input name="email" type="email" autocomplete="email" required></label>
+ <label>WhatsApp (opcional)<input name="whatsapp" type="tel" inputmode="tel" autocomplete="tel"></label>
+ <label>Mail de tu cuenta de Peineta o nombre del salón (opcional)<input name="cuenta"></label>
+ <label>Comentario (opcional)<textarea name="detalle" rows="3" maxlength="1000"></textarea></label>
+ <p class="err" id="err" role="alert"></p>
+ <button class="btn" id="send" type="submit">Enviar pedido</button>
+</form>
+<div id="ok" style="display:none" role="status" aria-live="polite">
+ <p style="margin-top:0"><b>Recibimos tu pedido.</b> Este es tu código de trámite, guardalo:</p>
+ <p class="code" id="code"></p>
+ <p>Te lo confirmamos por mail dentro de las 24 horas. Si tenés dudas, escribinos a <a href="mailto:minima.microapps@gmail.com">minima.microapps@gmail.com</a> indicando el código.</p>
+</div>
+</div>
+<p style="color:var(--g);font-size:14px">Derecho de arrepentimiento: artículo 34 de la Ley 24.240 y artículo 1110 del Código Civil y Comercial. Baja del servicio: artículo 10 ter de la Ley 24.240. Disposición 954/2025 de la Subsecretaría de Defensa del Consumidor y Lealtad Comercial.</p>
+<script>
+const URL_='https://hiejcxcvwgailprvxmtt.supabase.co', KEY='sb_publishable_7sCjiK7hc-RceSskMVUPkA_ydagCYbp';
+let tipo='arrepentimiento';
+const D={arrepentimiento:'Si contrataste Peineta en los últimos 10 días corridos, podés revocar la contratación sin costo ni responsabilidad. Te devolvemos lo cobrado por el mismo medio de pago.',baja:'Podés dar de baja Peineta cuando quieras, sin costo y sin dar explicaciones. A partir de la baja no se hacen más cobros.'};
+function sel(t){tipo=t;document.getElementById('t-arr').setAttribute('aria-selected',t==='arrepentimiento');document.getElementById('t-baja').setAttribute('aria-selected',t==='baja');document.getElementById('desc').textContent=D[t];document.getElementById('send').textContent=t==='baja'?'Pedir la baja':'Enviar arrepentimiento';}
+sel(location.hash==='#baja'?'baja':'arrepentimiento');
+document.getElementById('f').addEventListener('submit',async e=>{e.preventDefault();
+ const f=e.target,d=Object.fromEntries(new FormData(f)),err=document.getElementById('err'),b=document.getElementById('send');
+ if(!d.nombre.trim()){err.textContent='Completá tu nombre.';return}
+ if(!/^\S+@\S+\.\S+$/.test(d.email.trim())){err.textContent='Revisá tu mail.';return}
+ err.textContent='';b.disabled=true;b.textContent='Enviando…';
+ try{const r=await fetch(URL_+'/rest/v1/rpc/registrar_solicitud',{method:'POST',headers:{apikey:KEY,'Content-Type':'application/json'},
+  body:JSON.stringify({p_tipo:tipo,p_nombre:d.nombre,p_email:d.email,p_whatsapp:d.whatsapp||null,p_cuenta:d.cuenta||null,p_detalle:d.detalle||null})});
+  if(!r.ok)throw 0;const code=await r.json();
+  document.getElementById('code').textContent=code;f.style.display='none';document.getElementById('ok').style.display='block';
+ }catch(x){err.textContent='No pudimos registrar el pedido. Probá de nuevo o escribinos a minima.microapps@gmail.com.';b.disabled=false;sel(tipo);}
+});
+</script></div></main>
+<footer><div class="w"><p style="margin:0 0 8px"><a href="/terminos.html">Términos y condiciones</a><a href="/privacidad.html">Privacidad</a><a href="/arrepentimiento.html">Botón de arrepentimiento</a><a href="/arrepentimiento.html#baja">Botón de baja de servicio</a></p>
+<p style="margin:0">Atención: lunes a viernes de 9 a 17 h · <a href="mailto:minima.microapps@gmail.com">minima.microapps@gmail.com</a></p></div></footer>
+</body></html>
