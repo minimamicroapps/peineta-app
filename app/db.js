@@ -175,14 +175,16 @@
 
   /* ---------- plan y prueba ---------- */
   const daysLeft = () => SALON ? Math.ceil((new Date(SALON.prueba_hasta) - new Date()) / 864e5) : 0;
-  window.planBlocked = () => !!SALON && ((SALON.estado === 'prueba' && daysLeft() <= 0) || SALON.estado === 'vencido' || SALON.estado === 'cancelado');
-  window.planShort = () => !SALON ? '' : SALON.estado === 'activo' ? 'Plan Básico · activo' : SALON.estado === 'prueba' ? `Prueba gratis · ${Math.max(0, daysLeft())} ${daysLeft() === 1 ? 'día' : 'días'}` : 'Plan vencido';
+  const planVencido = () => SALON && SALON.estado === 'activo' && SALON.plan_hasta && new Date(SALON.plan_hasta) < new Date();
+  window.planBlocked = () => !!SALON && ((SALON.estado === 'prueba' && daysLeft() <= 0) || SALON.estado === 'vencido' || planVencido() || SALON.estado === 'cancelado');
+  window.planShort = () => !SALON ? '' : SALON.estado === 'activo' && !planVencido() ? 'Plan Básico · activo' : SALON.estado === 'prueba' ? `Prueba gratis · ${Math.max(0, daysLeft())} ${daysLeft() === 1 ? 'día' : 'días'}` : 'Plan vencido';
   const WA_PEINETA = '5492473517947'; // WhatsApp de Peineta (provisorio)
   window.planCard = () => {
     if (!SALON) return '';
     const fin = new Date(SALON.prueba_hasta).toLocaleDateString('es-AR', { day: 'numeric', month: 'long' });
     const st = SALON.estado === 'activo' ? '<span class="chip ok">Activo</span>' : `<span class="chip">${SALON.estado === 'prueba' ? 'Prueba' : 'Vencido'}</span>`;
     return `<div class="card"><div class="row"><div class="grow"><div class="t">${SALON.estado === 'activo' ? 'Plan Básico · $15.000 por mes' : 'Prueba gratis de 7 días'}</div><div class="s">Cuenta ${esc(S.settings.email || '')}</div></div>${st}</div>
+    ${SALON.estado === 'activo' && SALON.plan_hasta ? `<div class="row"><div class="grow"><div class="t">Pagado hasta el ${new Date(SALON.plan_hasta).toLocaleDateString('es-AR')}</div><div class="s">Para renovar, escribinos por WhatsApp</div></div></div>` : ''}
     ${SALON.estado === 'prueba' ? `<div class="row"><div class="grow"><div class="t">Tu prueba termina el ${fin}</div><div class="s">Después, $15.000 por mes: lo que sale un corte</div></div></div>` : ''}
     <a class="row click" href="https://wa.me/${WA_PEINETA}?text=${encodeURIComponent('Hola! Quiero activar Peineta para ' + (S.settings.salon || 'mi peluquería') + ' (' + (S.settings.email || '') + ')')}" target="_blank" rel="noopener" style="text-decoration:none;color:inherit"><div class="grow"><div class="t">${SALON.estado === 'activo' ? 'Consultas sobre tu plan' : 'Activar el plan'}</div><div class="s">Escribinos por WhatsApp</div></div><span style="color:var(--muted);font-size:20px">›</span></a>
     <div class="row click" data-act="cancelPlan"><div class="grow"><div class="t">Dar de baja el servicio</div><div class="s">Tus datos quedan guardados 90 días</div></div></div></div>`;
