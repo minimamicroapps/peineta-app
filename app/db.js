@@ -79,8 +79,8 @@
     ORDER.forEach(k => { o[k] = {}; (S[k] || []).forEach(x => { o[k][x.id] = JSON.stringify(M[k].toRow(x)) + (k === 'visits' ? JSON.stringify(itemsOf(x)) : '') }) });
     return o;
   };
-  const cacheKey = () => SALON ? 'peineta-cache-' + SALON.id : null;
-  const writeCache = () => { try { const k = cacheKey(); if (!k) return; const { form, ...rest } = S; localStorage.setItem(k, JSON.stringify(rest)) } catch (e) { } };
+  const cacheKey = (uid) => (uid || (SALON && SALON.owner_id)) ? 'peineta-cache2-' + (uid || SALON.owner_id) : null;
+  const writeCache = () => { try { const k = cacheKey(); if (!k || !S.authed) return; const { form, booting, ...rest } = S; localStorage.setItem(k, JSON.stringify({ S: rest, SALON, SNAP, SNAP_SETTINGS, SNAP_CLOSE })) } catch (e) { } };
 
   function setBadge(state) {
     let b = document.getElementById('syncb');
@@ -220,12 +220,18 @@
     if (m.includes('fetch') || m.includes('network')) return 'Sin conexión. Probá de nuevo';
     return 'No se pudo. Probá de nuevo en un rato';
   };
+  let fromCache = null;
+  window.addEventListener('online', async () => {
+    if (!fromCache) { flush(); return }
+    const u = fromCache; fromCache = null;
+    try { await flush(); await loadAll(u); setBadge('ok'); render() } catch (e) { fromCache = u }
+  });
   async function startSession(user) {
     S.booting = true; render();
     try { await loadAll(user) }
     catch (e) {
       console.error(e);
-      try { const c = JSON.parse(localStorage.getItem('peineta-cache-' + (SALON && SALON.id))); if (c) { S = { ...c, form: {}, booting: false, authed: true }; toast('Sin conexión: estás viendo lo último guardado') } else throw e }
+      try { const c = JSON.parse(localStorage.getItem(cacheKey(user.id))); if (c && c.SALON) { SALON = c.SALON; SNAP = c.SNAP || {}; SNAP_SETTINGS = c.SNAP_SETTINGS || ''; SNAP_CLOSE = c.SNAP_CLOSE || {}; S = { ...c.S, form: {}, booting: false, authed: true }; setBadge('error'); fromCache = user; toast('Sin conexión: estás viendo lo último guardado') } else throw e }
       catch (e2) { S = fresh(); S.booting = false; render(); toast(errText(e)); return }
     }
     S.booting = false; render();
@@ -262,6 +268,11 @@
       SALON = null; SNAP = {}; S = fresh(); render();
     }
   };
+
+  /* ---------- abrir sin conexión e instalar ---------- */
+  if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('/app/sw.js', { scope: '/app/' }).catch(() => { }));
+  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); window._inst = e });
+  window.addEventListener('appinstalled', () => { window._inst = null; if (S.sent) { S.sent.ob_home = S.sent.ob_home || new Date().toISOString().slice(0, 10); schedule() } });
 
   /* ---------- arranque ---------- */
   (async function boot() {

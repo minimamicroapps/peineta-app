@@ -469,6 +469,26 @@ function apptRow(a,showActions=true){
   <div class="s" style="font-size:12.5px;color:var(--muted)">${svcList(a.services)} · ${dur} min</div></div>
   ${act?`<div style="align-self:center;display:flex;flex-direction:column;gap:6px">${act}</div>`:''}</div>`}
 
+function firstSteps(){
+ if(S.sent.ob_hide)return'';
+ const st=[
+  {d:!!S.sent.ob_svc,t:'Revisá tus servicios y precios',s:'Ajustá nombres, precios y duración',a:'obGo',v:'servicios'},
+  {d:S.clients.length>0,t:'Cargá tu primer cliente',s:'Uno por uno o importá tu lista',a:'obGo',v:'clientas'},
+  {d:S.appts.length>0,t:'Agendá un turno',s:'Elegí día, hora, cliente y servicio',a:'obGo',v:'agenda'},
+  {d:S.visits.length>0,t:'Cobrá tu primera visita',s:'En el turno, tocá Cobrar',a:'obGo',v:'agenda'},
+  {d:!!S.sent.ob_msg,t:'Mirá tus mensajes de WhatsApp',s:'Recordatorio del turno y aviso de vuelta',a:'obGo',v:'mensajes'},
+  {d:!!S.sent.ob_home||matchMedia('(display-mode: standalone)').matches,t:'Poné Peineta en tu pantalla de inicio',s:'Se abre como una app, con un toque',a:'obHome',v:''}];
+ const n=st.filter(x=>x.d).length;if(n===st.length)return'';
+ return`<h2>Primeros pasos <small>${n} de ${st.length}</small></h2><div class="card">
+ <div style="height:5px;background:var(--line)"><div style="height:100%;width:${Math.round(n/st.length*100)}%;background:var(--brand)"></div></div>
+ ${st.map(x=>`<div class="row ${x.d?'':'click'}" ${x.d?'':`data-act="${x.a}" data-v="${x.v}"`}><div style="width:26px;height:26px;border-radius:50%;flex:none;display:grid;place-items:center;${x.d?'background:var(--brand);color:#fff':'border:2px solid var(--line)'}">${x.d?'✓':''}</div><div class="grow"><div class="t" style="${x.d?'text-decoration:line-through;color:var(--muted)':''}">${x.t}</div>${x.d?'':`<div class="s">${x.s}</div>`}</div>${x.d?'':'<span style="color:var(--muted);font-size:20px">›</span>'}</div>`).join('')}
+ <div class="row" style="justify-content:flex-end;border-bottom:0"><button class="btn" data-act="obHide" style="color:var(--muted);font-weight:500">Ocultar esta lista</button></div></div>`}
+function vHomeHelp(){const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
+ return`<h3 style="margin:4px 0 10px">Poné Peineta en tu pantalla de inicio</h3>
+ ${window._inst?`<button class="btn pri block" data-act="obInstall" style="margin-bottom:14px">Instalar ahora</button>`:''}
+ <div class="card"><div class="row"><div class="grow"><div class="t">${ios?'En iPhone (Safari)':'En Android (Chrome)'}</div><div class="s">${ios?'1. Tocá el botón Compartir (el cuadrado con la flecha hacia arriba).<br>2. Elegí "Agregar a inicio".<br>3. Tocá "Agregar".':'1. Tocá los tres puntitos ⋮ arriba a la derecha.<br>2. Elegí "Instalar app" o "Agregar a la pantalla principal".<br>3. Confirmá.'}</div></div></div>
+ <div class="row" style="border-bottom:0"><div class="grow"><div class="t">${ios?'¿Tenés Android?':'¿Tenés iPhone?'}</div><div class="s">${ios?'En Chrome: tres puntitos ⋮ → "Instalar app".':'Abrila en Safari: Compartir → "Agregar a inicio".'}</div></div></div></div>
+ <button class="btn block" data-act="close" style="margin-top:14px">Listo</button>`}
 function vHoy(){
  const ap=S.appts.filter(a=>diff(a.date)===0).sort((a,b)=>a.time.localeCompare(b.time));
  const rem=reminders();const pend=rem.filter(r=>!sentKey('r'+r.c.id)).length;
@@ -476,6 +496,7 @@ function vHoy(){
  const bds=birthdays();const dorm=dormidas();
  const tom=S.appts.filter(a=>diff(a.date)===1&&a.status==='a confirmar');
  return`<section class="hello"><h1>Hola, ${esc(S.settings.owner)} 👋</h1><p>${(n=>`Tenés ${n} ${n===1?'turno pendiente':'turnos pendientes'}`)(ap.filter(a=>a.status!=='atendido'&&a.status!=='faltó').length)} hoy y ${pend} ${pend===1?T().sg:T().pl.toLowerCase()} para escribirles.</p></section>
+ ${firstSteps()}
  <div class="kpis"><div class="kpi hl"><b>${ap.length}</b><span>turnos hoy</span></div><div class="kpi"><b>${pend}</b><span>para escribir</span></div><div class="kpi"><b>${money(wk/1000)}k</b><span>esta semana</span></div></div>
  <h2>Turnos de hoy</h2><div class="card">${ap.length?ap.map(a=>apptRow(a)).join(''):'<div class="empty">No hay turnos para hoy.</div>'}</div>
  <h2>Para escribir hoy <small>les toca volver</small></h2>
@@ -925,6 +946,10 @@ const A={
   if(f.isNew)S.services.push({id:uid(),...data});else Object.assign(svc(f.id),data);
   save();closeSheet();render();toast('Servicio guardado')},
  delSvc(){const f=S.form;if(!f.confirmDel){f.confirmDel=true;renderSheet();return}svc(f.id).off=true;save();closeSheet();render();toast('Servicio eliminado')},
+ obGo(d){const v=d.v;if(v==='servicios'||v==='mensajes'){S.sent[v==='servicios'?'ob_svc':'ob_msg']=iso(today);save();S.tab='ajustes';S.ajSec=v}else{S.tab=v;S.ajSec=null}S.clientId=null;render();scrollTop()},
+ obHome(){S.sent.ob_home=iso(today);save();openSheet(vHomeHelp);render()},
+ obInstall(){const e=window._inst;if(!e)return;e.prompt();e.userChoice.finally(()=>{window._inst=null;closeSheet&&closeSheet()})},
+ obHide(){S.sent.ob_hide=iso(today);save();render();toast('Listo. La lista no se muestra más')},
  ajOpen(d){S.ajSec=d.v;render();scrollTop()},
  ajBack(){S.ajSec=null;render();scrollTop()},
  cancelPlan(){location.href='/arrepentimiento.html#baja'},
