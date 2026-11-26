@@ -688,7 +688,8 @@ function vAjustes(){
  if(sec&&SEC[sec]){const it=AJ.find(x=>x[0]===sec);return`<button class="ajback" data-act="ajBack">${ic('back',18)} Ajustes</button><h1 class="serif" style="font-size:24px;margin-top:4px">${it[1]}</h1>${SEC[sec]()}`}
  const sub={salon:esc(s.salon),servicios:`${activeSvcs().length} servicios`,puntos:`1 punto cada $${nf(s.earnPer)}`,horarios:`${s.hours.days.length} días · ${s.hours.open} a ${s.hours.close}`,mensajes:'7 plantillas',cuenta:planShort()};
  return`<h1 class="serif" style="font-size:24px;margin-top:6px">Ajustes</h1>
- <div class="card" style="margin-top:14px">${AJ.map(([k,t,d,i])=>`<div class="row click" data-act="ajOpen" data-v="${k}"><div class="ajic">${ic(i,20)}</div><div class="grow"><div class="t">${t}</div><div class="s">${d}</div></div><span class="s" style="max-width:110px;text-align:right">${sub[k]}</span><span style="color:var(--muted);font-size:20px">›</span></div>`).join('')}</div>`}
+ <div class="card" style="margin-top:14px">${AJ.map(([k,t,d,i])=>`<div class="row click" data-act="ajOpen" data-v="${k}"><div class="ajic">${ic(i,20)}</div><div class="grow"><div class="t">${t}</div><div class="s">${d}</div></div><span class="s" style="max-width:110px;text-align:right">${sub[k]}</span><span style="color:var(--muted);font-size:20px">›</span></div>`).join('')}</div>
+ ${S.sent.ob_hide?`<div class="card" style="margin-top:14px"><div class="row click" data-act="obShow" style="border-bottom:0"><div class="ajic">${ic('star',20)}</div><div class="grow"><div class="t">Ver primeros pasos</div><div class="s">Volver a mostrar la lista en Hoy</div></div><span style="color:var(--muted);font-size:20px">›</span></div></div>`:''}`}
 
 function vLogin(){
  const s=S.settings;const L=S.loginStep||0;const head=`<div class="mark"><svg width="44" height="44" viewBox="0 0 200 200" aria-hidden="true"><rect x="44" y="30.0" width="40" height="6.2" rx="3.1" fill="#FF5A3C"/><rect x="44" y="42.2" width="40" height="6.2" rx="3.1" fill="#FF5A3C"/><rect x="44" y="54.3" width="40" height="6.2" rx="3.1" fill="#FF5A3C"/><rect x="44" y="66.5" width="40" height="6.2" rx="3.1" fill="#FF5A3C"/><rect x="44" y="78.7" width="40" height="6.2" rx="3.1" fill="#FF5A3C"/><rect x="44" y="90.8" width="40" height="6.2" rx="3.1" fill="#FF5A3C"/><rect x="44" y="103.0" width="40" height="6.2" rx="3.1" fill="#FF5A3C"/><rect x="44" y="115.1" width="40" height="6.2" rx="3.1" fill="#FF5A3C"/><rect x="44" y="127.3" width="40" height="6.2" rx="3.1" fill="#FF5A3C"/><rect x="44" y="139.5" width="40" height="6.2" rx="3.1" fill="#FF5A3C"/><rect x="44" y="151.6" width="40" height="6.2" rx="3.1" fill="#FF5A3C"/><rect x="44" y="163.8" width="40" height="6.2" rx="3.1" fill="#FF5A3C"/><rect x="78" y="26" width="26" height="148" rx="5" fill="#EFE4D2"/><path d="M90 41 H118 A35 35 0 0 1 118 111 H90" fill="none" stroke="#EFE4D2" stroke-width="28"/></svg></div><div style="font-family:Sora,DM Sans,sans-serif;font-weight:700;font-size:22px;letter-spacing:-.02em;margin:-10px 0 18px">peineta</div>`;
@@ -949,7 +950,8 @@ const A={
  obGo(d){const v=d.v;if(v==='servicios'||v==='mensajes'){S.sent[v==='servicios'?'ob_svc':'ob_msg']=iso(today);save();S.tab='ajustes';S.ajSec=v}else{S.tab=v;S.ajSec=null}S.clientId=null;render();scrollTop()},
  obHome(){S.sent.ob_home=iso(today);save();openSheet(vHomeHelp);render()},
  obInstall(){const e=window._inst;if(!e)return;e.prompt();e.userChoice.finally(()=>{window._inst=null;closeSheet&&closeSheet()})},
- obHide(){S.sent.ob_hide=iso(today);save();render();toast('Listo. La lista no se muestra más')},
+ obHide(){S.sent.ob_hide=iso(today);save();render();toast('Listo. Si la querés ver de nuevo, está en Ajustes')},
+ obShow(){delete S.sent.ob_hide;save();S.tab='hoy';S.ajSec=null;render();scrollTop()},
  ajOpen(d){S.ajSec=d.v;render();scrollTop()},
  ajBack(){S.ajSec=null;render();scrollTop()},
  cancelPlan(){location.href='/arrepentimiento.html#baja'},
