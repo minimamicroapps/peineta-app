@@ -13,7 +13,9 @@ Deno.serve(async (req) => {
   if (error || !salon) return json({ error: "sin_salon" }, 404);
   if (salon.mp_estado === "authorized") return json({ error: "ya_activo" }, 409);
 
-  const precio = Number(Deno.env.get("PRECIO_MENSUAL") || 15000);
+  // precio vigente: tabla config (Juan lo cambia desde su panel)
+  const { data: conf } = await db.from("config").select("valor").eq("clave", "precio").maybeSingle();
+  const precio = Number(conf?.valor?.mensual || 15000);
   const appUrl = Deno.env.get("APP_URL") || "https://peineta.netlify.app/app/";
   // En modo prueba, Mercado Pago exige que quien paga sea un usuario de prueba.
   const payer = Deno.env.get("MP_PAYER_PRUEBA") || user.email;

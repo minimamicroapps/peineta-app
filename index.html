@@ -176,6 +176,9 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:2
 .shot h3{font:700 17px Sora,sans-serif;margin:16px 0 4px}
 .shot p{font-size:14.5px;color:#cfc6bb;margin:0}
 @media(max-width:860px){.shots-row{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:16px;padding-bottom:12px;margin-left:-20px;margin-right:-20px;padding-left:20px;padding-right:20px}.shot{flex:0 0 66%;scroll-snap-align:center}}
+.launch{background:#FFF1EC;color:#B23A22;border-radius:12px;padding:10px 12px;font-size:14.5px;line-height:1.45;margin:-4px 0 16px}
+.launch-hero{display:inline-block;margin-top:12px;background:rgba(255,90,60,.14);color:#FFB4A3;border:1px solid rgba(255,90,60,.35);border-radius:99px;padding:7px 14px;font-size:14px;font-weight:600}
+[hidden]{display:none!important}
 </style>
 </head>
 <body>
@@ -202,7 +205,8 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:2
         <a class="btn btn-o" href="#anotate">Anotarme para probarla gratis</a>
         <a class="btn btn-ghost" href="#como-funciona">Cómo funciona</a>
       </div>
-      <p class="small">7 días gratis · Sin tarjeta · Después $15.000 por mes</p>
+      <p class="small">7 días gratis · Sin tarjeta · Después <span data-precio>$15.000</span> por mes</p>
+      <p class="launch-hero" data-lanzamiento>🎉 Precio de lanzamiento congelado <span data-meses>6</span> meses para las primeras <span data-cupos>50</span> peluquerías</p>
     </div>
     <div class="phone">
       <div class="screen"><img src="/img/hoy.webp" width="600" height="1298" alt="Pantalla Hoy de Peineta: turnos del día, clientes para escribir y lo cobrado en la semana" style="display:block;width:100%;height:auto"></div>
@@ -289,7 +293,8 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:2
     </div>
     <div class="card">
       <span class="tag">7 días gratis · Sin tarjeta</span>
-      <p class="amount">$15.000 <small>/ mes</small></p>
+      <p class="amount"><span data-precio>$15.000</span> <small>/ mes</small></p>
+      <p class="launch" data-lanzamiento><b>Precio de lanzamiento:</b> si entrás entre las primeras <span data-cupos>50</span> peluquerías, lo mantenés <span data-meses>6</span> meses aunque después suba.</p>
       <ul>
         <li>Agenda de turnos, turnos fijos y días libres</li>
         <li>Recordatorios por WhatsApp ilimitados</li>
@@ -402,5 +407,6 @@ f.addEventListener('submit', async (e) => {
 });
 document.querySelectorAll('a[href="#anotate"]').forEach(a => a.addEventListener('click', () => { if (window.fbq) fbq('track', 'ViewContent', { content_name: 'cta_anotate' }); }));
 </script>
+<script src="/app/precio.js"></script>
 </body>
 </html>

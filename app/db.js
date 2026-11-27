@@ -189,17 +189,17 @@
     const activo = SALON.estado === 'activo' && !planVencido();
     const st = activo ? '<span class="chip ok">Activo</span>' : `<span class="chip">${SALON.estado === 'prueba' && daysLeft() > 0 ? 'Prueba' : 'Vencido'}</span>`;
     let filas = '';
-    if (SALON.estado === 'prueba') filas += `<div class="row"><div class="grow"><div class="t">Tu prueba termina el ${fechaLarga(SALON.prueba_hasta)}</div><div class="s">Después, $15.000 por mes: lo que sale un corte</div></div></div>`;
+    if (SALON.estado === 'prueba') filas += `<div class="row"><div class="grow"><div class="t">Tu prueba termina el ${fechaLarga(SALON.prueba_hasta)}</div><div class="s">Después, ${precioTxt()} por mes: lo que sale un corte</div></div></div>`;
     if (activo && mpActiva()) filas += `<div class="row"><div class="grow"><div class="t">Se renueva sola cada mes</div><div class="s">Pagado hasta el ${fechaLarga(SALON.plan_hasta)} · con Mercado Pago</div></div></div>`;
     else if (activo && mpCancelada()) filas += `<div class="row"><div class="grow"><div class="t">Suscripción cancelada</div><div class="s">Podés seguir usando Peineta hasta el ${fechaLarga(SALON.plan_hasta)}</div></div></div>`;
     else if (activo && SALON.plan_hasta) filas += `<div class="row"><div class="grow"><div class="t">Pagado hasta el ${fechaLarga(SALON.plan_hasta)}</div></div></div>`;
-    if (!mpActiva()) filas += fila(activo && mpCancelada() ? 'Volver a activar la suscripción' : activo ? 'Pasar al pago automático' : 'Activar el plan', '$15.000 por mes con Mercado Pago · cancelás cuando quieras', 'activarPlan');
+    if (!mpActiva()) filas += fila(activo && mpCancelada() ? 'Volver a activar la suscripción' : activo ? 'Pasar al pago automático' : 'Activar el plan', precioTxt() + ' por mes con Mercado Pago · cancelás cuando quieras', 'activarPlan');
     if (mpActiva()) filas += fila('Cancelar suscripción', 'Dejás de pagar; usás Peineta hasta el fin del mes pagado', 'cancelSub');
     filas += `<a class="row click" href="${waLink('Hola! Tengo una consulta sobre Peineta (' + (S.settings.email || '') + ')')}" target="_blank" rel="noopener" style="text-decoration:none;color:inherit"><div class="grow"><div class="t">Consultas sobre tu plan</div><div class="s">Escribinos por WhatsApp</div></div><span style="color:var(--muted);font-size:20px">›</span></a>`;
     filas += `<div class="row click" data-act="cancelPlan"><div class="grow"><div class="t">Dar de baja el servicio</div><div class="s">Tus datos quedan guardados 90 días</div></div></div>`;
-    return `<div class="card"><div class="row"><div class="grow"><div class="t">${activo ? 'Plan Básico · $15.000 por mes' : 'Prueba gratis de 7 días'}</div><div class="s">Cuenta ${esc(S.settings.email || '')}</div></div>${st}</div>${filas}</div>`;
+    return `<div class="card"><div class="row"><div class="grow"><div class="t">${activo ? 'Plan Básico' : 'Prueba gratis de 7 días'}</div><div class="s">Cuenta ${esc(S.settings.email || '')}</div></div>${st}</div>${filas}</div>`;
   };
-  window.vBlocked = () => `<div class="login"><div class="mark">⏳</div><h1>${SALON && SALON.estado === 'prueba' ? 'Tu prueba gratis terminó' : 'Tu plan venció'}</h1><p>Tus datos están guardados. Para seguir usando Peineta activá el Plan Básico: $15.000 por mes con Mercado Pago. Cancelás cuando quieras.</p>
+  window.vBlocked = () => `<div class="login"><div class="mark">⏳</div><h1>${SALON && SALON.estado === 'prueba' ? 'Tu prueba gratis terminó' : 'Tu plan venció'}</h1><p>Tus datos están guardados. Para seguir usando Peineta activá el Plan Básico: ${precioTxt()} por mes con Mercado Pago. Cancelás cuando quieras.</p>
     <button class="btn pri block" data-act="activarPlan">Activar el plan</button>
     <a class="btn block" style="margin-top:8px" href="${waLink('Hola! Necesito ayuda para activar Peineta (' + (S.settings.email || '') + ')')}" target="_blank" rel="noopener">Ayuda por WhatsApp</a>
     <button class="btn block" style="margin-top:8px;color:var(--muted)" data-act="logout">Cerrar sesión</button></div>`;
@@ -220,7 +220,7 @@
       const s = await refrescarSalon();
       if (s && s.estado === 'activo' && s.mp_estado === 'authorized') {
         render(); toast('¡Listo! Tu plan está activo');
-        try { if (window.fbq) fbq('track', 'Purchase', { value: 15000, currency: 'ARS' }) } catch (e) { }
+        try { if (window.fbq) fbq('track', 'Purchase', { value: window.PRECIO.mensual, currency: 'ARS' }) } catch (e) { }
         return true;
       }
       await new Promise(r => setTimeout(r, 3000));
@@ -317,6 +317,7 @@
     }
   };
 
+  document.addEventListener('precio', () => { if (S && S.authed && !S.booting) render() });
   /* ---------- abrir sin conexión e instalar ---------- */
   if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('/app/sw.js', { scope: '/app/' }).catch(() => { }));
   window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); window._inst = e });

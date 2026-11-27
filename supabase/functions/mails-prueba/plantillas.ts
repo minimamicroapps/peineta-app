@@ -1,10 +1,11 @@
 // Los 5 mails automáticos de la prueba gratis de Peineta.
 // Variables: nombre (de la dueña/dueño), salon, diasRestantes, clientes, mensajes, link.
 
-export type Datos = { nombre: string; salon: string; clientes: number; mensajes: number; link: string };
+export type Datos = { nombre: string; salon: string; clientes: number; mensajes: number; link: string; precio: number };
 export type Mail = { asunto: string; html: string };
 
 const APP = "https://peineta.netlify.app/app/";
+const pesos = (n: number) => "$" + Number(n || 15000).toLocaleString("es-AR");
 const esc = (s: string) => String(s || "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
 
 function marco(titulo: string, cuerpo: string, boton: string, link = APP) {
@@ -57,7 +58,7 @@ export const plantillas: Record<number, (d: Datos) => Mail> = {
     html: marco(
       "Te quedan 2 días de prueba",
       `<p style="margin:0 0 12px">En estos días con Peineta${d.clientes ? ` cargaste <b>${d.clientes} clientes</b>` : ""}${d.clientes && d.mensajes ? " y" : ""}${d.mensajes ? ` mandaste <b>${d.mensajes} mensajes</b> por WhatsApp` : ""}${d.clientes || d.mensajes ? "." : " ya tenés todo listo para ordenar tu peluquería."}</p>
-       <p style="margin:0 0 12px">Para seguir, el Plan Básico es <b>$15.000 por mes</b>: lo que sale un corte. Se paga con Mercado Pago y cancelás cuando quieras.</p>
+       <p style="margin:0 0 12px">Para seguir, el Plan Básico es <b>${pesos(d.precio)} por mes</b>: lo que sale un corte. Se paga con Mercado Pago y cancelás cuando quieras.</p>
        <p style="margin:0">Lo activás desde <b>Ajustes → Mi plan y cuenta → Activar el plan</b>.</p>`,
       "Activar mi plan",
     ),
@@ -68,7 +69,7 @@ export const plantillas: Record<number, (d: Datos) => Mail> = {
     html: marco(
       "Hoy termina tu prueba gratis",
       `<p style="margin:0 0 12px">Mañana Peineta se pausa para ${esc(d.salon) || "tu peluquería"}. Tus datos quedan guardados: clientes, turnos, caja y puntos.</p>
-       <p style="margin:0">Activá el plan hoy y seguís sin cortar: <b>$15.000 por mes</b> con Mercado Pago, sin permanencia.</p>`,
+       <p style="margin:0">Activá el plan hoy y seguís sin cortar: <b>${pesos(d.precio)} por mes</b> con Mercado Pago, sin permanencia.</p>`,
       "Seguir usando Peineta",
     ),
   }),

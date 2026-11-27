@@ -17,9 +17,11 @@ Deno.serve(async (req) => {
   const { data: lista, error } = await db.rpc("mails_pendientes");
   if (error) return new Response(error.message, { status: 500 });
 
+  const { data: conf } = await db.from("config").select("valor").eq("clave", "precio").maybeSingle();
+  const precio = Number(conf?.valor?.mensual || 15000);
   let enviados = 0;
   for (const m of lista || []) {
-    const mail = plantillas[m.dia]({ nombre: m.nombre, salon: m.salon, clientes: m.clientes, mensajes: m.mensajes, link: "" });
+    const mail = plantillas[m.dia]({ nombre: m.nombre, salon: m.salon, clientes: m.clientes, mensajes: m.mensajes, link: "", precio });
     const r = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },

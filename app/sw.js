@@ -1,7 +1,7 @@
 // Peineta: abre la app aunque no haya internet.
 // Siempre intenta traer la versión nueva; si no hay conexión, usa la última guardada.
-const CACHE = 'peineta-app-v1';
-const FILES = ['/app/', '/app/db.js', '/app/supabase.js', '/app/manifest.webmanifest', '/app/icon-192.png', '/app/icon-512.png'];
+const CACHE = 'peineta-app-v2';
+const FILES = ['/app/', '/app/db.js', '/app/supabase.js', '/app/precio.js', '/app/manifest.webmanifest', '/app/icon-192.png', '/app/icon-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));

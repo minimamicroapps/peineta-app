@@ -704,7 +704,7 @@ function vLogin(){
  if(L===3)return`<div class="login"><div class="mark">✉</div><h1>Revisá tu mail</h1><p>Si <b>${esc(s.email)}</b> tiene una cuenta, te llega un link para crear una contraseña nueva. Vence en 1 hora.</p>
   <button class="btn line block" data-act="loginBack">Volver a ingresar</button>
   <div class="foot">Si no te llega, revisá la carpeta de spam.</div></div>`;
- if(L===4)return`<div class="login">${head}<h1 style="font-size:28px">Probá 7 días gratis</h1><p>Sin tarjeta. Después, $15.000 por mes: lo que sale un corte.</p>
+ if(L===4)return`<div class="login">${head}<h1 style="font-size:28px">Probá 7 días gratis</h1><p>Sin tarjeta. Después, ${precioTxt()} por mes: lo que sale un corte.</p>
   <div class="field"><label for="em">Tu mail</label><input class="inp" id="em" type="email" placeholder="tu@mail.com" autocomplete="email" style="padding:14px"></div>
   <div class="field"><label for="pw2">Creá una contraseña</label>${pw('pw2','Mínimo 8 caracteres')}</div>
   <button class="btn pri block" data-act="signup">Crear mi cuenta</button>
@@ -1082,6 +1082,7 @@ document.addEventListener('change',e=>{const el=e.target;
 S.booting=true;
 </script>
 <script src="/app/supabase.js"></script>
+<script src="/app/precio.js"></script>
 <script src="/app/db.js"></script>
 </body>
 </html>

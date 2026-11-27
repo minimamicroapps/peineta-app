@@ -50,7 +50,7 @@ button,.btn{font:inherit;border:1px solid var(--line);background:#fff;border-rad
 <script src="/app/supabase.js"></script>
 <script>
 const sb = supabase.createClient('https://hiejcxcvwgailprvxmtt.supabase.co', 'sb_publishable_7sCjiK7hc-RceSskMVUPkA_ydagCYbp', { auth: { persistSession: true, autoRefreshToken: true } });
-const PRECIO = 15000;
+let PRECIO = 15000, CONF = { mensual: 15000, lanzamiento: { activo: true, cupos: 50, meses: 6 } };
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const money = n => '$' + Math.round(n).toLocaleString('es-AR');
@@ -76,7 +76,8 @@ async function load() {
   if (!session) return vLogin();
   const { data: ok } = await sb.rpc('es_admin');
   if (!ok) { $('#root').innerHTML = `<div class="login"><h1>No autorizado</h1><p class="s">Esta cuenta no tiene acceso al panel.</p><br><button id="out">Salir</button></div>`; $('#out').onclick = async () => { await sb.auth.signOut(); vLogin() }; return }
-  const [a, b, c] = await Promise.all([sb.rpc('panel_salones'), sb.rpc('panel_lista_espera'), sb.rpc('panel_cobros')]);
+  const [a, b, c, d] = await Promise.all([sb.rpc('panel_salones'), sb.rpc('panel_lista_espera'), sb.rpc('panel_cobros'), sb.from('config').select('valor').eq('clave', 'precio').maybeSingle()]);
+  if (d.data) { CONF = d.data.valor; PRECIO = +CONF.mensual }
   if (a.error) { $('#root').innerHTML = `<p class="empty">No se pudo cargar: ${esc(a.error.message)}</p>`; return }
   SAL = a.data.map(s => ({ ...s, er: estadoReal(s) })); ESP = b.data || []; COB = c.data || [];
   render();
@@ -99,8 +100,13 @@ function render() {
   <div class="tabs">${tabs.map(([k, t]) => `<button data-t="${k}" class="${TAB === k ? 'on' : ''}">${t}</button>`).join('')}</div>
   ${TAB === 'espera' ? vEspera() : list.length ? list.map(vSalon).join('') : '<p class="empty">No hay peluquerías en esta lista.</p>'}
   ${COB.length ? `<h3 style="margin:18px 0 8px;font-size:15px">Cobros por mes</h3><div class="card">${COB.map(m => `<div class="top" style="padding:4px 0"><div class="grow">${new Date(m.mes + 'T12:00').toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })}</div><span class="s">${m.cobros} cobros</span>&nbsp;&nbsp;<b>${money(m.total)}</b></div>`).join('')}</div>` : ''}
+  <h3 style="margin:18px 0 8px;font-size:15px">Precio</h3>
+  <div class="card"><div class="top" style="align-items:center;gap:10px;flex-wrap:wrap"><span>$</span><input id="pr" type="number" min="1000" step="100" value="${PRECIO}" style="font:inherit;width:120px;padding:8px;border:1px solid var(--line);border-radius:10px"><span class="s">por mes</span>
+  <label class="s" style="display:flex;gap:6px;align-items:center"><input id="pl" type="checkbox" ${CONF.lanzamiento && CONF.lanzamiento.activo ? 'checked' : ''}> Mostrar "precio de lanzamiento"</label><button id="prg" class="pri">Guardar</button></div>
+  <p class="note">Cambia el precio en la landing, la app y los Términos, y lo que se cobra a las peluquerías que se suscriban desde ahora. Las que ya pagan siguen con su precio.</p></div>
   <p class="note">"Cobrado" son los pagos aprobados por Mercado Pago. "Esperado" es peluquerías activas × ${money(PRECIO)}.</p>`;
   document.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { TAB = b.dataset.t; render() });
+  $('#prg').onclick = async () => { const n = Math.round(+$('#pr').value); if (!(n >= 1000)) return alert('Revisá el precio'); if (!confirm(`¿Cambiar el precio a ${money(n)} por mes para las suscripciones nuevas?`)) return; const { error } = await sb.rpc('panel_set_precio', { p_mensual: n, p_lanzamiento: $('#pl').checked }); if (error) alert('No se pudo guardar: ' + error.message); else load() };
   $('#rf').onclick = load; $('#out').onclick = async () => { await sb.auth.signOut(); vLogin() };
 }
 function cobradoMes() { const m = new Date(); const k = new Date(m.getFullYear(), m.getMonth(), 1).toISOString().slice(0, 7); const r = COB.find(x => String(x.mes).slice(0, 7) === k); return r ? +r.total : 0 }
