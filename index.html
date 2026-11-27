@@ -165,6 +165,17 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:2
   .hero{padding:40px 0 64px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* capturas reales */
+.shots{background:#111;color:#F6F1EA;padding:72px 0}
+.shots .sub{color:#cfc6bb}
+.shots-row{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:34px}
+.shot{text-align:center;margin:0}
+.shot .ph{background:#000;border-radius:30px;padding:8px;box-shadow:0 20px 50px rgba(0,0,0,.45),0 0 0 2px #2a2a2a}
+.shot img{display:block;width:100%;height:auto;border-radius:23px}
+.shot h3{font:700 17px Sora,sans-serif;margin:16px 0 4px}
+.shot p{font-size:14.5px;color:#cfc6bb;margin:0}
+@media(max-width:860px){.shots-row{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:16px;padding-bottom:12px;margin-left:-20px;margin-right:-20px;padding-left:20px;padding-right:20px}.shot{flex:0 0 66%;scroll-snap-align:center}}
 </style>
 </head>
 <body>
@@ -193,19 +204,8 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:2
       </div>
       <p class="small">7 días gratis · Sin tarjeta · Después $15.000 por mes</p>
     </div>
-    <div class="phone" role="img" aria-label="Pantalla de Peineta con la agenda de turnos del día">
-      <div class="screen">
-        <div class="sc-top"><small>Martes 24 · 9 turnos</small><b>Agenda de hoy</b></div>
-        <div class="alert">💬 3 clientes para escribir hoy</div>
-        <div class="sc-h">Mañana</div>
-        <div class="cl"><span class="tm">9:00</span><div><b>Martín A.</b><small>Corte · 30 min</small></div><span class="ck">Vino</span></div>
-        <div class="cl"><span class="tm">9:30</span><div><b>Carolina R.</b><small>Color + brushing · 2 h</small></div><span class="ck">Vino</span></div>
-        <div class="cl now"><span class="tm">11:30</span><div><b>Lucía F.</b><small>Corte · 45 min</small></div><span class="wa">Recordar</span></div>
-        <div class="sc-h">Tarde</div>
-        <div class="cl"><span class="tm">15:00</span><div><b>Tomás G.</b><small>Corte + barba · 45 min</small></div><span class="wa">Recordar</span></div>
-        <div class="cl free"><span class="tm">16:00</span><div><b>Libre</b><small>Tocá para dar un turno</small></div><span class="plus">+</span></div>
-        <div class="sc-pad"></div>
-      </div>
+    <div class="phone">
+      <div class="screen"><img src="/img/hoy.webp" width="600" height="1298" alt="Pantalla Hoy de Peineta: turnos del día, clientes para escribir y lo cobrado en la semana" style="display:block;width:100%;height:auto"></div>
     </div>
   </div>
 </header>
@@ -236,6 +236,20 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:2
       <div class="f"><div class="ic"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="13" rx="2"/><circle cx="12" cy="12.5" r="3"/><path d="M6 6V4h12v2"/></svg></div><h3>Caja del día</h3><p>Cobrás y queda anotado: efectivo, transferencia o Mercado Pago. Sumás tus gastos y al final del día sabés lo que te quedó.</p></div>
       <div class="f"><div class="ic"><svg viewBox="0 0 24 24"><path d="M6 2h12l2 6H4z"/><path d="M4 8v13h16V8M10 12h4"/></svg></div><h3>Servicios y productos</h3><p>Tus servicios con su precio y duración, y tus productos con foto y stock que se descuenta solo cuando vendés.</p></div>
       <div class="f"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 2l3 6.5 7 .8-5.2 4.7 1.5 7L12 17.5 5.7 21l1.5-7L2 9.3l7-.8z"/></svg></div><h3>Puntos y premios</h3><p>Tus clientes suman puntos con cada visita y los canjean por premios que elegís vos. Ven sus puntos desde su propio link.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="shots" aria-labelledby="shots-h">
+  <div class="wrap">
+    <p class="eyebrow">Así se ve</p>
+    <h2 id="shots-h">La app de verdad, no un dibujo.</h2>
+    <p class="sub">Estas son pantallas reales de Peineta, con una peluquería de ejemplo.</p>
+    <div class="shots-row">
+      <figure class="shot"><div class="ph"><img src="/img/agenda.webp" width="600" height="1298" loading="lazy" alt="Agenda de Peineta con los turnos del día"></div><h3>Tu agenda</h3><p>Todo el día, turno por turno. Cobrás o marcás "no vino" con un toque.</p></figure>
+      <figure class="shot"><div class="ph"><img src="/img/escribir.webp" width="600" height="1298" loading="lazy" alt="Lista de clientes a los que les toca volver, con botón de WhatsApp"></div><h3>Para escribir hoy</h3><p>A quién le toca volver, con el mensaje de WhatsApp ya escrito.</p></figure>
+      <figure class="shot"><div class="ph"><img src="/img/caja.webp" width="600" height="1298" loading="lazy" alt="Caja de Peineta con ingresos, gastos y lo que te quedó"></div><h3>Tu caja</h3><p>Cuánto entró, cuánto gastaste y cuánto te quedó.</p></figure>
+      <figure class="shot"><div class="ph"><img src="/img/ficha.webp" width="600" height="1298" loading="lazy" alt="Ficha de cliente con visitas, gasto y saldo de puntos"></div><h3>Cada cliente y sus puntos</h3><p>Cuándo vino, cuánto gastó y los puntos que va juntando.</p></figure>
     </div>
   </div>
 </section>
