@@ -179,19 +179,54 @@
   window.planBlocked = () => !!SALON && ((SALON.estado === 'prueba' && daysLeft() <= 0) || SALON.estado === 'vencido' || planVencido() || SALON.estado === 'cancelado');
   window.planShort = () => !SALON ? '' : SALON.estado === 'activo' && !planVencido() ? 'Plan Básico · activo' : SALON.estado === 'prueba' ? `Prueba gratis · ${Math.max(0, daysLeft())} ${daysLeft() === 1 ? 'día' : 'días'}` : 'Plan vencido';
   const WA_PEINETA = '5492473517947'; // WhatsApp de Peineta (provisorio)
+  const waLink = (t) => `https://wa.me/${WA_PEINETA}?text=${encodeURIComponent(t)}`;
+  const fechaLarga = (d) => new Date(d).toLocaleDateString('es-AR', { day: 'numeric', month: 'long' });
+  const mpActiva = () => SALON && SALON.mp_estado === 'authorized';
+  const mpCancelada = () => SALON && SALON.estado === 'activo' && (SALON.mp_estado === 'cancelled' || SALON.mp_estado === 'paused');
+  const fila = (t, s, act, extra = '') => `<div class="row click" data-act="${act}" ${extra}><div class="grow"><div class="t">${t}</div><div class="s">${s}</div></div><span style="color:var(--muted);font-size:20px">›</span></div>`;
   window.planCard = () => {
     if (!SALON) return '';
-    const fin = new Date(SALON.prueba_hasta).toLocaleDateString('es-AR', { day: 'numeric', month: 'long' });
-    const st = SALON.estado === 'activo' ? '<span class="chip ok">Activo</span>' : `<span class="chip">${SALON.estado === 'prueba' ? 'Prueba' : 'Vencido'}</span>`;
-    return `<div class="card"><div class="row"><div class="grow"><div class="t">${SALON.estado === 'activo' ? 'Plan Básico · $15.000 por mes' : 'Prueba gratis de 7 días'}</div><div class="s">Cuenta ${esc(S.settings.email || '')}</div></div>${st}</div>
-    ${SALON.estado === 'activo' && SALON.plan_hasta ? `<div class="row"><div class="grow"><div class="t">Pagado hasta el ${new Date(SALON.plan_hasta).toLocaleDateString('es-AR')}</div><div class="s">Para renovar, escribinos por WhatsApp</div></div></div>` : ''}
-    ${SALON.estado === 'prueba' ? `<div class="row"><div class="grow"><div class="t">Tu prueba termina el ${fin}</div><div class="s">Después, $15.000 por mes: lo que sale un corte</div></div></div>` : ''}
-    <a class="row click" href="https://wa.me/${WA_PEINETA}?text=${encodeURIComponent('Hola! Quiero activar Peineta para ' + (S.settings.salon || 'mi peluquería') + ' (' + (S.settings.email || '') + ')')}" target="_blank" rel="noopener" style="text-decoration:none;color:inherit"><div class="grow"><div class="t">${SALON.estado === 'activo' ? 'Consultas sobre tu plan' : 'Activar el plan'}</div><div class="s">Escribinos por WhatsApp</div></div><span style="color:var(--muted);font-size:20px">›</span></a>
-    <div class="row click" data-act="cancelPlan"><div class="grow"><div class="t">Dar de baja el servicio</div><div class="s">Tus datos quedan guardados 90 días</div></div></div></div>`;
+    const activo = SALON.estado === 'activo' && !planVencido();
+    const st = activo ? '<span class="chip ok">Activo</span>' : `<span class="chip">${SALON.estado === 'prueba' && daysLeft() > 0 ? 'Prueba' : 'Vencido'}</span>`;
+    let filas = '';
+    if (SALON.estado === 'prueba') filas += `<div class="row"><div class="grow"><div class="t">Tu prueba termina el ${fechaLarga(SALON.prueba_hasta)}</div><div class="s">Después, $15.000 por mes: lo que sale un corte</div></div></div>`;
+    if (activo && mpActiva()) filas += `<div class="row"><div class="grow"><div class="t">Se renueva sola cada mes</div><div class="s">Pagado hasta el ${fechaLarga(SALON.plan_hasta)} · con Mercado Pago</div></div></div>`;
+    else if (activo && mpCancelada()) filas += `<div class="row"><div class="grow"><div class="t">Suscripción cancelada</div><div class="s">Podés seguir usando Peineta hasta el ${fechaLarga(SALON.plan_hasta)}</div></div></div>`;
+    else if (activo && SALON.plan_hasta) filas += `<div class="row"><div class="grow"><div class="t">Pagado hasta el ${fechaLarga(SALON.plan_hasta)}</div></div></div>`;
+    if (!mpActiva()) filas += fila(activo && mpCancelada() ? 'Volver a activar la suscripción' : activo ? 'Pasar al pago automático' : 'Activar el plan', '$15.000 por mes con Mercado Pago · cancelás cuando quieras', 'activarPlan');
+    if (mpActiva()) filas += fila('Cancelar suscripción', 'Dejás de pagar; usás Peineta hasta el fin del mes pagado', 'cancelSub');
+    filas += `<a class="row click" href="${waLink('Hola! Tengo una consulta sobre Peineta (' + (S.settings.email || '') + ')')}" target="_blank" rel="noopener" style="text-decoration:none;color:inherit"><div class="grow"><div class="t">Consultas sobre tu plan</div><div class="s">Escribinos por WhatsApp</div></div><span style="color:var(--muted);font-size:20px">›</span></a>`;
+    filas += `<div class="row click" data-act="cancelPlan"><div class="grow"><div class="t">Dar de baja el servicio</div><div class="s">Tus datos quedan guardados 90 días</div></div></div>`;
+    return `<div class="card"><div class="row"><div class="grow"><div class="t">${activo ? 'Plan Básico · $15.000 por mes' : 'Prueba gratis de 7 días'}</div><div class="s">Cuenta ${esc(S.settings.email || '')}</div></div>${st}</div>${filas}</div>`;
   };
-  window.vBlocked = () => `<div class="login"><div class="mark">⏳</div><h1>Tu prueba gratis terminó</h1><p>Tus datos están guardados. Para seguir usando Peineta activá el Plan Básico: $15.000 por mes.</p>
-    <a class="btn pri block" href="https://wa.me/${WA_PEINETA}?text=${encodeURIComponent('Hola! Quiero activar Peineta para ' + (S.settings.salon || 'mi peluquería') + ' (' + (S.settings.email || '') + ')')}" target="_blank" rel="noopener">Activar por WhatsApp</a>
+  window.vBlocked = () => `<div class="login"><div class="mark">⏳</div><h1>${SALON && SALON.estado === 'prueba' ? 'Tu prueba gratis terminó' : 'Tu plan venció'}</h1><p>Tus datos están guardados. Para seguir usando Peineta activá el Plan Básico: $15.000 por mes con Mercado Pago. Cancelás cuando quieras.</p>
+    <button class="btn pri block" data-act="activarPlan">Activar el plan</button>
+    <a class="btn block" style="margin-top:8px" href="${waLink('Hola! Necesito ayuda para activar Peineta (' + (S.settings.email || '') + ')')}" target="_blank" rel="noopener">Ayuda por WhatsApp</a>
     <button class="btn block" style="margin-top:8px;color:var(--muted)" data-act="logout">Cerrar sesión</button></div>`;
+  /* ---------- cobro con Mercado Pago ---------- */
+  async function llamar(fn) {
+    const { data, error } = await sb.functions.invoke(fn, { body: {} });
+    if (!error) return { ok: true, data };
+    let cuerpo = {}; try { cuerpo = await error.context.json() } catch (e) { }
+    return { ok: false, status: error.context && error.context.status, data: cuerpo };
+  }
+  async function refrescarSalon() {
+    const { data } = await sb.from('salones').select('*').single();
+    if (data) { SALON = data; writeCache() }
+    return data;
+  }
+  async function esperarActivacion(intentos) {
+    for (let i = 0; i < intentos; i++) {
+      const s = await refrescarSalon();
+      if (s && s.estado === 'activo' && s.mp_estado === 'authorized') {
+        render(); toast('¡Listo! Tu plan está activo');
+        try { if (window.fbq) fbq('track', 'Purchase', { value: 15000, currency: 'ARS' }) } catch (e) { }
+        return true;
+      }
+      await new Promise(r => setTimeout(r, 3000));
+    }
+    render(); return false;
+  }
   window.vBoot = () => `<div class="login"><div class="mark">✂️</div><p style="color:var(--muted)">Cargando…</p></div>`;
 
   /* ---------- perfil público del cliente (?c=token) ---------- */
@@ -238,6 +273,19 @@
   }
   window.DB = {
     schedule,
+    async activar() {
+      toast('Abriendo Mercado Pago…');
+      const r = await llamar('mp-suscribir');
+      if (r.ok && r.data && r.data.url) { location.href = r.data.url; return }
+      if (r.status === 409) { await esperarActivacion(1); return }
+      if (r.status === 503) { window.open(waLink('Hola! Quiero activar Peineta para ' + (S.settings.salon || 'mi peluquería') + ' (' + (S.settings.email || '') + ')'), '_blank'); return }
+      toast('No se pudo abrir Mercado Pago. Probá de nuevo en un rato');
+    },
+    async cancelarSuscripcion() {
+      const r = await llamar('mp-cancelar');
+      if (r.ok) { await refrescarSalon(); render(); toast('Suscripción cancelada. Podés usar Peineta hasta el fin del mes pagado'); return }
+      toast('No se pudo cancelar. Escribinos por WhatsApp y lo hacemos al instante');
+    },
     async login(email, pass) {
       const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
       if (error) { toast(errText(error)); return }
@@ -287,7 +335,14 @@
     sb.auth.onAuthStateChange((ev) => { if (ev === 'PASSWORD_RECOVERY') { recovering = true; S = fresh(); S.booting = false; S.loginStep = 5; render() } });
     const { data: { session } } = await sb.auth.getSession();
     if (recovering) { S = fresh(); S.booting = false; S.loginStep = 5; render(); return }
-    if (session) startSession(session.user);
+    if (session) {
+      await startSession(session.user);
+      if (new URLSearchParams(location.search).get('suscripcion') === 'ok') {
+        history.replaceState(null, '', location.pathname);
+        toast('Confirmando tu pago con Mercado Pago…');
+        esperarActivacion(20);
+      }
+    }
     else { S.booting = false; render() }
   })();
 })();

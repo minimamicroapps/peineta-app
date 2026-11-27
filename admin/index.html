@@ -57,7 +57,7 @@ const money = n => '$' + Math.round(n).toLocaleString('es-AR');
 const fecha = d => d ? new Date(d).toLocaleDateString('es-AR', { day: 'numeric', month: 'short' }) : '—';
 const dias = d => d ? Math.ceil((new Date(d) - Date.now()) / 864e5) : null;
 const hace = d => { if (!d) return 'nunca'; const n = Math.floor((Date.now() - new Date(d)) / 864e5); return n <= 0 ? 'hoy' : n === 1 ? 'ayer' : `hace ${n} días` };
-let SAL = [], ESP = [], TAB = 'todas';
+let SAL = [], ESP = [], COB = [], TAB = 'todas';
 
 function estadoReal(s) {
   if (s.estado === 'activo' && s.plan_hasta && new Date(s.plan_hasta) < Date.now()) return 'vencido';
@@ -76,9 +76,9 @@ async function load() {
   if (!session) return vLogin();
   const { data: ok } = await sb.rpc('es_admin');
   if (!ok) { $('#root').innerHTML = `<div class="login"><h1>No autorizado</h1><p class="s">Esta cuenta no tiene acceso al panel.</p><br><button id="out">Salir</button></div>`; $('#out').onclick = async () => { await sb.auth.signOut(); vLogin() }; return }
-  const [a, b] = await Promise.all([sb.rpc('panel_salones'), sb.rpc('panel_lista_espera')]);
+  const [a, b, c] = await Promise.all([sb.rpc('panel_salones'), sb.rpc('panel_lista_espera'), sb.rpc('panel_cobros')]);
   if (a.error) { $('#root').innerHTML = `<p class="empty">No se pudo cargar: ${esc(a.error.message)}</p>`; return }
-  SAL = a.data.map(s => ({ ...s, er: estadoReal(s) })); ESP = b.data || [];
+  SAL = a.data.map(s => ({ ...s, er: estadoReal(s) })); ESP = b.data || []; COB = c.data || [];
   render();
 }
 function render() {
@@ -90,17 +90,20 @@ function render() {
   const tabs = [['todas', `Todas (${SAL.length})`], ['prueba', `En prueba (${pru})`], ['activo', `Activas (${act})`], ['vencen', `Por vencer (${sem})`], ['vencido', `Vencidas (${ven})`], ['espera', `Lista de espera (${ESP.length})`]];
   $('#root').innerHTML = `<header><h1>Peineta <small>· panel</small></h1><button id="rf">Actualizar</button><button id="out">Salir</button></header>
   <div class="kpis">
-    <div class="kpi hl"><b>${money(act * PRECIO)}</b><span>ingreso por mes (${act} activas)</span></div>
+    <div class="kpi hl"><b>${money(cobradoMes())}</b><span>cobrado este mes con Mercado Pago</span></div>
+    <div class="kpi"><b>${money(act * PRECIO)}</b><span>ingreso mensual esperado (${act} activas)</span></div>
     <div class="kpi"><b>${pru}</b><span>en prueba</span></div>
     <div class="kpi"><b>${nuevos}</b><span>registros últimos 7 días</span></div>
     <div class="kpi"><b>${SAL.length ? Math.round(act / SAL.length * 100) : 0}%</b><span>pasaron a pago</span></div>
   </div>
   <div class="tabs">${tabs.map(([k, t]) => `<button data-t="${k}" class="${TAB === k ? 'on' : ''}">${t}</button>`).join('')}</div>
   ${TAB === 'espera' ? vEspera() : list.length ? list.map(vSalon).join('') : '<p class="empty">No hay peluquerías en esta lista.</p>'}
-  <p class="note">El ingreso es estimado: peluquerías activas × ${money(PRECIO)}. Cuando esté Mercado Pago, se ven los cobros reales.</p>`;
+  ${COB.length ? `<h3 style="margin:18px 0 8px;font-size:15px">Cobros por mes</h3><div class="card">${COB.map(m => `<div class="top" style="padding:4px 0"><div class="grow">${new Date(m.mes + 'T12:00').toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })}</div><span class="s">${m.cobros} cobros</span>&nbsp;&nbsp;<b>${money(m.total)}</b></div>`).join('')}</div>` : ''}
+  <p class="note">"Cobrado" son los pagos aprobados por Mercado Pago. "Esperado" es peluquerías activas × ${money(PRECIO)}.</p>`;
   document.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { TAB = b.dataset.t; render() });
   $('#rf').onclick = load; $('#out').onclick = async () => { await sb.auth.signOut(); vLogin() };
 }
+function cobradoMes() { const m = new Date(); const k = new Date(m.getFullYear(), m.getMonth(), 1).toISOString().slice(0, 7); const r = COB.find(x => String(x.mes).slice(0, 7) === k); return r ? +r.total : 0 }
 function wa(tel, txt) { const t = String(tel || '').replace(/\D/g, ''); if (!t) return ''; const n = t.startsWith('54') ? t : '549' + t.replace(/^0/, ''); return `<a class="btn" target="_blank" rel="noopener" href="https://wa.me/${n}?text=${encodeURIComponent(txt)}">WhatsApp</a>` }
 function vSalon(s) {
   const lbl = { prueba: 'Prueba', activo: 'Activa', vencido: 'Vencida', cancelado: 'Baja' }[s.er] || s.er;
@@ -109,6 +112,7 @@ function vSalon(s) {
   return `<div class="card"><div class="top"><div class="grow"><div class="t">${esc(s.peluqueria || 'Sin nombre')}</div><div class="s">${esc(s.dueno || '')}${s.dueno ? ' · ' : ''}${esc(s.mail)}</div></div><span class="chip c-${s.er}">${lbl}</span></div>
   <div class="s" style="margin-top:6px">${fin} · se registró el ${fecha(s.creado)} · último ingreso ${hace(s.ultimo_ingreso)}</div>
   <div class="nums"><span><b>${s.clientes}</b> clientes</span><span><b>${s.turnos}</b> turnos</span><span><b>${s.visitas}</b> cobros</span><span><b>${s.visitas_7d}</b> cobros esta semana</span></div>
+  ${s.mp_estado || +s.pagado_total ? `<div class="s" style="margin-top:6px">Mercado Pago: ${{ authorized: 'pago automático activo', pending: 'abrió el pago pero no lo terminó', cancelled: 'suscripción cancelada', paused: 'suscripción pausada' }[s.mp_estado] || s.mp_estado || '—'} · nos pagó ${money(s.pagado_total)} en total</div>` : ''}
   ${frio ? '<div class="s alert" style="margin-top:6px">Casi no cargó clientes: conviene escribirle y ofrecer ayuda.</div>' : ''}
   <div class="acts">${wa(s.telefono, `Hola${s.dueno ? ' ' + s.dueno : ''}! Te escribo de Peineta. ¿Cómo te está yendo con la app? Si querés, te ayudo a cargar tus clientes.`)}<a class="btn" href="mailto:${esc(s.mail)}">Mail</a></div></div>`;
 }
