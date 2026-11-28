@@ -4,7 +4,7 @@
 import { createClient } from "npm:@supabase/supabase-js@2.49.4";
 import { plantillas } from "./plantillas.ts";
 
-const REMITENTE = "Peineta <hola@peineta.com.ar>";
+const REMITENTE = "Juan de Peineta <hola@peineta.com.ar>";
 const RESPONDER_A = "minima.microapps@gmail.com";
 
 Deno.serve(async (req) => {
@@ -24,7 +24,7 @@ Deno.serve(async (req) => {
       const r = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
-        body: JSON.stringify({ from: REMITENTE, to: body.prueba, reply_to: RESPONDER_A, subject: "[Prueba] " + m.asunto, html: m.html }),
+        body: JSON.stringify({ from: REMITENTE, to: body.prueba, reply_to: RESPONDER_A, subject: m.asunto, html: m.html, text: m.texto }),
       });
       resultados.push({ dia, status: r.status, detalle: await r.text() });
     }
@@ -42,7 +42,7 @@ Deno.serve(async (req) => {
     const r = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: "Bearer " + key, "Content-Type": "application/json" },
-      body: JSON.stringify({ from: REMITENTE, to: m.mail, reply_to: RESPONDER_A, subject: mail.asunto, html: mail.html }),
+      body: JSON.stringify({ from: REMITENTE, to: m.mail, reply_to: RESPONDER_A, subject: mail.asunto, html: mail.html, text: mail.texto }),
     });
     if (r.ok) {
       await db.from("mails_enviados").insert({ salon_id: m.salon_id, dia: m.dia });
