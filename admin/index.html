@@ -71,11 +71,38 @@ function vLogin(msg) {
   <button class="pri">Entrar</button><div class="err">${esc(msg || '')}</div></form>`;
   $('#f').onsubmit = async e => { e.preventDefault(); const { error } = await sb.auth.signInWithPassword({ email: $('#em').value.trim(), password: $('#pw').value }); if (error) vLogin('Mail o contraseña incorrectos'); else load() };
 }
+async function vDobleFactor(msg) {
+  const { data } = await sb.auth.mfa.listFactors();
+  const ok = (data && data.totp || []).find(f => f.status === 'verified');
+  if (ok) {
+    $('#root').innerHTML = `<form class="login" id="f"><h1>Código de seguridad</h1><p class="s" style="margin-bottom:12px">Abrí la app de autenticación del celular (Google Authenticator) y escribí el código de 6 números de "Panel Peineta".</p>
+    <input id="cod" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456" required><button class="pri">Entrar</button><div class="err">${esc(msg || '')}</div>
+    <button type="button" id="out" style="margin-top:10px;background:none;border:0;color:var(--muted)">Salir</button></form>`;
+    $('#out').onclick = async () => { await sb.auth.signOut(); vLogin() };
+    $('#cod').focus();
+    $('#f').onsubmit = async e => { e.preventDefault(); const { error } = await sb.auth.mfa.challengeAndVerify({ factorId: ok.id, code: $('#cod').value.trim() }); if (error) vDobleFactor('Código incorrecto o vencido. Probá con el próximo.'); else load() };
+    return;
+  }
+  // primera vez: activar el doble factor
+  for (const f of (data && data.all || []).filter(f => f.status !== 'verified')) await sb.auth.mfa.unenroll({ factorId: f.id });
+  const { data: en, error } = await sb.auth.mfa.enroll({ factorType: 'totp', friendlyName: 'Panel Peineta', issuer: 'Peineta' });
+  if (error) { $('#root').innerHTML = `<p class="empty">No se pudo activar el doble factor: ${esc(error.message)}</p>`; return }
+  $('#root').innerHTML = `<form class="login" id="f"><h1>Activá el código de seguridad</h1>
+  <p class="s" style="margin-bottom:10px">Por seguridad, el panel pide un código del celular además de la contraseña. Se configura una sola vez:</p>
+  <ol class="s" style="margin:0 0 12px 18px;padding:0"><li>Instalá <b>Google Authenticator</b> en tu celular.</li><li>Tocá <b>+</b> → <b>Escanear un código QR</b> y escaneá este:</li></ol>
+  <img src="${en.totp.qr_code}" alt="Código QR" style="width:200px;height:200px;display:block;margin:0 auto 10px;background:#fff;padding:8px;border-radius:10px">
+  <p class="s" style="margin-bottom:12px;overflow-wrap:anywhere">¿No podés escanear? Cargá esta clave a mano: <b>${esc(en.totp.secret)}</b></p>
+  <input id="cod" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Código de 6 números" required><button class="pri">Activar y entrar</button><div class="err">${esc(msg || '')}</div></form>`;
+  $('#f').onsubmit = async e => { e.preventDefault(); const { error } = await sb.auth.mfa.challengeAndVerify({ factorId: en.id, code: $('#cod').value.trim() }); if (error) { $('.err').textContent = 'Código incorrecto. Esperá el próximo y probá de nuevo.' } else load() };
+}
 async function load() {
   const { data: { session } } = await sb.auth.getSession();
   if (!session) return vLogin();
-  const { data: ok } = await sb.rpc('es_admin');
+  const { data: ok } = await sb.rpc('es_admin_usuario');
   if (!ok) { $('#root').innerHTML = `<div class="login"><h1>No autorizado</h1><p class="s">Esta cuenta no tiene acceso al panel.</p><br><button id="out">Salir</button></div>`; $('#out').onclick = async () => { await sb.auth.signOut(); vLogin() }; return }
+  // Doble factor: el panel ve datos de todas las peluquerías, así que además de la contraseña pide el código del celular
+  const { data: aal } = await sb.auth.mfa.getAuthenticatorAssuranceLevel();
+  if (!aal || aal.currentLevel !== 'aal2') return vDobleFactor();
   const [a, b, c, d] = await Promise.all([sb.rpc('panel_salones'), sb.rpc('panel_lista_espera'), sb.rpc('panel_cobros'), sb.from('config').select('valor').eq('clave', 'precio').maybeSingle()]);
   if (d.data) { CONF = d.data.valor; PRECIO = +CONF.mensual }
   if (a.error) { $('#root').innerHTML = `<p class="empty">No se pudo cargar: ${esc(a.error.message)}</p>`; return }
