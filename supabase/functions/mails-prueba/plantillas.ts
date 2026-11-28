@@ -28,10 +28,10 @@ export const plantillas: Record<number, (d: Datos) => Mail> = {
   0: (d) =>
     armar(`${d.nombre ? d.nombre + ", " : ""}ya podés usar Peineta`, [
       hola(d),
-      `Gracias por probar Peineta${d.salon ? " para " + d.salon : ""}. Tenés 7 días gratis, sin tarjeta.`,
-      "Para arrancar te recomiendo 3 cosas, te llevan 10 minutos:\n1. Revisá tus servicios y precios en Ajustes.\n2. Cargá tus clientes (de a uno o pegando tu lista de contactos).\n3. Agendá los turnos de esta semana.",
-      "Entrás desde acá: {LINK}. Si la agregás a la pantalla de inicio del celular, queda como una app más.",
-      "Si te trabás con algo, respondé este mail y te ayudo.",
+      `Gracias por crear tu cuenta${d.salon ? " para " + d.salon : ""}. Soy Juan, uno de los que hace Peineta.`,
+      "Para arrancar, lo mejor es revisar tus servicios en Ajustes, cargar algunos clientes y agendar los turnos de esta semana. Te lleva unos 10 minutos.",
+      "Entrás desde acá: {LINK}",
+      "Si te trabás con algo o tenés una duda, respondé este mail y te ayudo.",
     ], "peineta.com.ar/app"),
 
   // Día 2: el primer recordatorio
@@ -46,11 +46,11 @@ export const plantillas: Record<number, (d: Datos) => Mail> = {
 
   // Día 5: quedan 2 días
   5: (d) =>
-    armar("Te quedan 2 días de prueba", [
+    armar("¿Cómo te está yendo con Peineta?", [
       hola(d),
       `Te escribo porque en 2 días termina tu prueba de Peineta${d.clientes || d.mensajes ? ". Hasta ahora " : "."}${d.clientes ? `cargaste ${d.clientes} clientes` : ""}${d.clientes && d.mensajes ? " y " : ""}${d.mensajes ? `mandaste ${d.mensajes} mensajes por WhatsApp` : ""}${d.clientes || d.mensajes ? "." : ""}`,
-      `Si te sirve y querés seguir, son ${pesos(d.precio)} por mes y lo cancelás cuando quieras. Lo activás en Ajustes, en "Mi plan y cuenta": {LINK}`,
-      "Y si algo no te cerró o te faltó algo, contame respondiendo este mail. Me sirve mucho saberlo.",
+      `Si te está sirviendo y querés seguir usándola, lo dejás listo en Ajustes, en "Mi plan y cuenta": {LINK}`,
+      "¿Te faltó algo o hay algo que no te cerró? Contame respondiendo este mail, me sirve mucho saberlo.",
     ], "peineta.com.ar/app"),
 
   // Día 7: hoy termina

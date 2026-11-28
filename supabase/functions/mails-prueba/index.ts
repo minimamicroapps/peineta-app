@@ -18,7 +18,7 @@ Deno.serve(async (req) => {
   // modo prueba: manda los 5 mails de ejemplo a una casilla, sin registrar nada
   if (body.prueba) {
     const resultados = [];
-    for (const dia of [0, 2, 5, 7, 9]) {
+    for (const dia of (body.dias || [0, 2, 5, 7, 9])) {
       const { data: conf } = await db.from("config").select("valor").eq("clave", "precio").maybeSingle();
       const m = plantillas[dia]({ nombre: "Ana", salon: "Estilo Ana", clientes: 48, mensajes: 12, link: "", precio: Number(conf?.valor?.mensual || 15000) });
       const r = await fetch("https://api.resend.com/emails", {
