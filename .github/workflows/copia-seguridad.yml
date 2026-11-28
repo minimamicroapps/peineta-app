@@ -1,0 +1,37 @@
+# Copia de seguridad diaria de la base de Peineta.
+# Se guarda CIFRADA (AES-256) como archivo de GitHub por 30 días: sin la clave nadie puede leerla.
+# Necesita dos secretos del repositorio (Settings → Secrets and variables → Actions):
+#   SUPABASE_DB_URL  → cadena de conexión de Supabase (Connect → Session pooler)
+#   BACKUP_CLAVE     → una clave larga que solo conocen Juan y Lucía (sirve para abrir las copias)
+name: Copia de seguridad diaria
+on:
+  schedule:
+    - cron: "41 6 * * *"   # todos los días, 3:41 de Argentina
+  workflow_dispatch:
+jobs:
+  copia:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Instalar cliente de PostgreSQL 17
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSo /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client-17
+      - name: Copiar y cifrar
+        env:
+          DB: ${{ secrets.SUPABASE_DB_URL }}
+          CLAVE: ${{ secrets.BACKUP_CLAVE }}
+        run: |
+          set -euo pipefail
+          test -n "$DB" && test -n "$CLAVE"
+          F=peineta-$(date -u +%Y-%m-%d)
+          /usr/lib/postgresql/17/bin/pg_dump "$DB" -n public -n admin -n auth --no-owner --no-privileges -Fc -f "$F.dump"
+          gpg --batch --yes --symmetric --cipher-algo AES256 --passphrase "$CLAVE" -o "$F.dump.gpg" "$F.dump"
+          rm "$F.dump"
+          ls -la "$F.dump.gpg"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: copia-${{ github.run_id }}
+          path: "*.dump.gpg"
+          retention-days: 30
