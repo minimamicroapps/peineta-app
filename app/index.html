@@ -233,6 +233,9 @@ const addDays=n=>{const d=new Date(today);d.setDate(d.getDate()+n);return iso(d)
 const parse=s=>{const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
 const diff=s=>Math.round((parse(s)-today)/DAY);
 const $=s=>document.querySelector(s);
+// Seguridad: los textos que escribe o importa la peluquería nunca llevan caracteres de código
+const limpio=v=>String(v??'').replace(/[<>"`]/g,c=>({'<':'‹','>':'›','"':'”','`':"'"}[c]));
+document.addEventListener('input',e=>{const t=e.target;if((t.tagName==='TEXTAREA'||(t.tagName==='INPUT'&&/^(text|search|tel|email|)$/.test(t.type)))&&/[<>"`]/.test(t.value)){const p=t.selectionStart;t.value=limpio(t.value);try{t.setSelectionRange(p,p)}catch(x){}}},true);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const money=n=>(n<0?'−$':'$')+Math.abs(Math.round(n)).toLocaleString('es-AR');
 const first=n=>n.split(' ')[0];
@@ -1024,7 +1027,7 @@ const A={
  impParse(){const t=S.form.paste||'';const rows=parseRows(t.split(/\n/).map(l=>l.split(/[,;\t]/)));if(!rows.length){toast('No encontré clientes en la lista');return}S.form.rows=rows;renderSheet()},
  impG(d){const r=S.form.rows[+d.i];r.g=r.g===d.v?'':d.v;renderSheet()},
  impBack(){S.form.rows=null;renderSheet()},
- impSave(){const ok=S.form.rows.filter(r=>r.ok);ok.forEach((r,k)=>S.clients.push({id:uid(),token:uid(),g:r.g,name:r.name,phone:r.phone,bday:'',origin:'Importado',formula:'',notes:'',photos:[]}));save();closeSheet();render();toast(`Importaste ${ok.length} ${ok.length===1?'cliente':'clientes'} ✓`)},
+ impSave(){const ok=S.form.rows.filter(r=>r.ok);ok.forEach((r,k)=>S.clients.push({id:uid(),token:uid(),g:r.g,name:limpio(r.name),phone:limpio(r.phone),bday:'',origin:'Importado',formula:'',notes:'',photos:[]}));save();closeSheet();render();toast(`Importaste ${ok.length} ${ok.length===1?'cliente':'clientes'} ✓`)},
  expData(){S.form={};openSheet(sheetExport)},
  expDo(d){const t=toTSV(exportSets()[d.v]());const ok=()=>toast('Tabla copiada · pegala en Excel o Google Sheets');try{navigator.clipboard.writeText(t).then(ok,()=>{S.form.fallback=t;renderSheet()})}catch(e){S.form.fallback=t;renderSheet()}},
  portalExit(){S.portal=null;render()},
@@ -1073,7 +1076,7 @@ document.addEventListener('change',e=>{const el=e.target;
  if(el.dataset.hours){S.settings.hours[el.dataset.hours]=el.value;save()}
  if(el.id==='csvIn'&&el.files[0]){const file=el.files[0];el.value='';const done=rows=>{const r=parseRows(rows);if(!r.length){toast('No encontré clientes en el archivo');return}S.form.rows=r;renderSheet()};
   if(/\.xlsx?$/i.test(file.name)){const go=()=>{const rd=new FileReader();rd.onload=()=>{try{const wb=XLSX.read(rd.result,{type:'array'});done(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1}))}catch(e){toast('No pude leer el Excel')}};rd.readAsArrayBuffer(file)};
-   if(window.XLSX)go();else{const sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';sc.onload=go;sc.onerror=()=>toast('No pude abrir el Excel. Probá guardarlo como .csv');document.head.appendChild(sc)}}
+   if(window.XLSX)go();else{const sc=document.createElement('script');sc.src='/app/xlsx.full.min.js';sc.onload=go;sc.onerror=()=>toast('No pude abrir el Excel. Probá guardarlo como .csv');document.head.appendChild(sc)}}
   else{const rd=new FileReader();rd.onload=()=>done(String(rd.result).split(/\r?\n/).map(l=>l.split(/[,;\t]/)));rd.readAsText(file)}}
  if(el.id==='prodIn'&&el.files[0]){readImage(el.files[0],400,'image/jpeg',u=>{S.form.photo=u;renderSheet()});el.value=''}
  if(el.id==='logoIn'&&el.files[0]){readImage(el.files[0],200,'image/png',u=>{S.settings.logo=u;save();render();toast('Logo actualizado')});el.value=''}
