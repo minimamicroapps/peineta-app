@@ -292,7 +292,7 @@
       startSession(data.user);
     },
     async signup(email, pass) {
-      const { data, error } = await sb.auth.signUp({ email, password: pass, options: { data: { tipo: 'u' } } });
+      const { data, error } = await sb.auth.signUp({ email, password: pass, options: { data: { tipo: 'u', terminos_aceptados: new Date().toISOString(), terminos_version: '2026-11-28' } } });
       if (error) { toast(errText(error)); return }
       if (!data.session) { toast('Revisá tu mail para confirmar la cuenta'); return }
       try { if (window.fbq) fbq('track', 'Lead', { content_name: 'registro_prueba' }) } catch (e) { }

@@ -13,13 +13,16 @@ const FIRMA = "Juan\nPeineta";
 
 // párrafos en texto plano → mail simple (sin colores, sin botones, tipografía del cliente de correo)
 function armar(asunto: string, parrafos: string[], linkTexto: string): Mail {
-  const texto = parrafos.join("\n\n").replace("{LINK}", APP) + "\n\n" + FIRMA;
+  parrafos = [...parrafos];
+  const BAJA = 'Si no querés que te escriba más sobre la prueba, respondé este mail con un "no".';
+  const texto = parrafos.join("\n\n").replace("{LINK}", APP) + "\n\n" + FIRMA + "\n\n" + BAJA;
   const html =
     `<div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.5;color:#222">` +
     parrafos
       .map((p) => `<p style="margin:0 0 14px">${esc(p).replace("{LINK}", `<a href="${APP}">${linkTexto}</a>`).replace(/\n/g, "<br>")}</p>`)
       .join("") +
-    `<p style="margin:0">Juan<br>Peineta</p></div>`;
+    `<p style="margin:0">Juan<br>Peineta</p>` +
+    `<p style="margin:18px 0 0;font-size:12px;color:#888">${esc(BAJA)}</p></div>`;
   return { asunto, html, texto };
 }
 

@@ -1,0 +1,3 @@
+-- Pendiente de aplicar (Supabase pidió confirmación): aceptación de términos, borrado a 90 días,
+-- pagos que se conservan, pedido de no recibir mails, pedidos de arrepentimiento/baja en el panel.
+-- (contenido idéntico al enviado el 28/11; se aplica cuando Juan confirme)
