@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="theme-color" content="#111111">
+<title>Panel · Peineta</title>
+<link rel="icon" href="/app/icon-192.png">
+<style>
+:root{--o:#FF5A3C;--ink:#111;--bg:#F6F1EA;--card:#fff;--line:#E8E0D5;--muted:#7A7068;--ok:#1F8A4C;--warn:#B7791F;--bad:#C0392B}
+*{box-sizing:border-box;margin:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.4}
+.wrap{max-width:860px;margin:0 auto;padding:18px 16px 60px}
+header{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+header h1{font-size:20px;flex:1}
+header small{color:var(--muted);font-weight:500}
+button,.btn{font:inherit;border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 12px;cursor:pointer;color:var(--ink);text-decoration:none;display:inline-block}
+.pri{background:var(--o);border-color:var(--o);color:#fff;font-weight:700}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:18px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.kpi b{display:block;font-size:24px}
+.kpi span{color:var(--muted);font-size:13px}
+.kpi.hl{background:var(--ink);color:#fff;border-color:var(--ink)}.kpi.hl span{color:#cfc6bb}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tabs button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px}
+.top{display:flex;gap:8px;align-items:flex-start}
+.top .grow{flex:1;min-width:0}
+.t{font-weight:700}
+.s{color:var(--muted);font-size:13px;overflow-wrap:anywhere}
+.chip{font-size:12px;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap}
+.c-prueba{background:#FFF1D6;color:var(--warn)}.c-activo{background:#DDF3E6;color:var(--ok)}.c-vencido,.c-cancelado{background:#FBE2DE;color:var(--bad)}
+.nums{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:13px}
+.nums b{font-size:15px}
+.acts{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.acts .btn{font-size:13px;padding:6px 10px}
+.alert{color:var(--bad);font-weight:600}
+.empty{color:var(--muted);text-align:center;padding:30px 0}
+.login{max-width:340px;margin:60px auto;background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px}
+.login h1{font-size:20px;margin-bottom:14px}
+.login input{width:100%;font:inherit;padding:12px;border:1px solid var(--line);border-radius:10px;margin-bottom:10px}
+.login button{width:100%;padding:12px}
+.err{color:var(--bad);font-size:14px;margin-top:8px;min-height:20px}
+.note{color:var(--muted);font-size:12.5px;margin-top:4px}
+</style>
+</head>
+<body>
+<div class="wrap" id="root"><p class="empty">Cargando…</p></div>
+<script src="/app/supabase.js"></script>
+<script>
+const sb = supabase.createClient('https://hiejcxcvwgailprvxmtt.supabase.co', 'sb_publishable_7sCjiK7hc-RceSskMVUPkA_ydagCYbp', { auth: { persistSession: true, autoRefreshToken: true } });
+let PRECIO = 15000, CONF = { mensual: 15000, lanzamiento: { activo: true, cupos: 50, meses: 6 } };
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const money = n => '$' + Math.round(n).toLocaleString('es-AR');
+const fecha = d => d ? new Date(d).toLocaleDateString('es-AR', { day: 'numeric', month: 'short' }) : '—';
+const dias = d => d ? Math.ceil((new Date(d) - Date.now()) / 864e5) : null;
+const hace = d => { if (!d) return 'nunca'; const n = Math.floor((Date.now() - new Date(d)) / 864e5); return n <= 0 ? 'hoy' : n === 1 ? 'ayer' : `hace ${n} días` };
+let SAL = [], ESP = [], COB = [], TAB = 'todas';
+
+function estadoReal(s) {
+  if (s.estado === 'activo' && s.plan_hasta && new Date(s.plan_hasta) < Date.now()) return 'vencido';
+  if (s.estado === 'prueba' && dias(s.prueba_hasta) <= 0) return 'vencido';
+  return s.estado;
+}
+function vLogin(msg) {
+  $('#root').innerHTML = `<form class="login" id="f"><h1>Panel de Peineta</h1>
+  <input id="em" type="email" placeholder="Tu mail" autocomplete="email" required>
+  <input id="pw" type="password" placeholder="Contraseña" autocomplete="current-password" required>
+  <button class="pri">Entrar</button><div class="err">${esc(msg || '')}</div></form>`;
+  $('#f').onsubmit = async e => { e.preventDefault(); const { error } = await sb.auth.signInWithPassword({ email: $('#em').value.trim(), password: $('#pw').value }); if (error) vLogin('Mail o contraseña incorrectos'); else load() };
+}
+async function vDobleFactor(msg) {
+  const { data } = await sb.auth.mfa.listFactors();
+  const ok = (data && data.totp || []).find(f => f.status === 'verified');
+  if (ok) {
+    $('#root').innerHTML = `<form class="login" id="f"><h1>Código de seguridad</h1><p class="s" style="margin-bottom:12px">Abrí la app de autenticación del celular (Google Authenticator) y escribí el código de 6 números de "Panel Peineta".</p>
+    <input id="cod" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456" required><button class="pri">Entrar</button><div class="err">${esc(msg || '')}</div>
+    <button type="button" id="out" style="margin-top:10px;background:none;border:0;color:var(--muted)">Salir</button></form>`;
+    $('#out').onclick = async () => { await sb.auth.signOut(); vLogin() };
+    $('#cod').focus();
+    $('#f').onsubmit = async e => { e.preventDefault(); const { error } = await sb.auth.mfa.challengeAndVerify({ factorId: ok.id, code: $('#cod').value.trim() }); if (error) vDobleFactor('Código incorrecto o vencido. Probá con el próximo.'); else load() };
+    return;
+  }
+  // primera vez: activar el doble factor
+  for (const f of (data && data.all || []).filter(f => f.status !== 'verified')) await sb.auth.mfa.unenroll({ factorId: f.id });
+  const { data: en, error } = await sb.auth.mfa.enroll({ factorType: 'totp', friendlyName: 'Panel Peineta', issuer: 'Peineta' });
+  if (error) { $('#root').innerHTML = `<p class="empty">No se pudo activar el doble factor: ${esc(error.message)}</p>`; return }
+  $('#root').innerHTML = `<form class="login" id="f"><h1>Activá el código de seguridad</h1>
+  <p class="s" style="margin-bottom:10px">Por seguridad, el panel pide un código del celular además de la contraseña. Se configura una sola vez:</p>
+  <ol class="s" style="margin:0 0 12px 18px;padding:0"><li>Instalá <b>Google Authenticator</b> en tu celular.</li><li>Tocá <b>+</b> → <b>Escanear un código QR</b> y escaneá este:</li></ol>
+  <img src="${en.totp.qr_code}" alt="Código QR" style="width:200px;height:200px;display:block;margin:0 auto 10px;background:#fff;padding:8px;border-radius:10px">
+  <p class="s" style="margin-bottom:12px;overflow-wrap:anywhere">¿No podés escanear? Cargá esta clave a mano: <b>${esc(en.totp.secret)}</b></p>
+  <input id="cod" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="Código de 6 números" required><button class="pri">Activar y entrar</button><div class="err">${esc(msg || '')}</div></form>`;
+  $('#f').onsubmit = async e => { e.preventDefault(); const { error } = await sb.auth.mfa.challengeAndVerify({ factorId: en.id, code: $('#cod').value.trim() }); if (error) { $('.err').textContent = 'Código incorrecto. Esperá el próximo y probá de nuevo.' } else load() };
+}
+async function load() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return vLogin();
+  const { data: ok } = await sb.rpc('es_admin_usuario');
+  if (!ok) { $('#root').innerHTML = `<div class="login"><h1>No autorizado</h1><p class="s">Esta cuenta no tiene acceso al panel.</p><br><button id="out">Salir</button></div>`; $('#out').onclick = async () => { await sb.auth.signOut(); vLogin() }; return }
+  // Doble factor: el panel ve datos de todas las peluquerías, así que además de la contraseña pide el código del celular
+  const { data: aal } = await sb.auth.mfa.getAuthenticatorAssuranceLevel();
+  if (!aal || aal.currentLevel !== 'aal2') return vDobleFactor();
+  const [a, b, c, d] = await Promise.all([sb.rpc('panel_salones'), sb.rpc('panel_lista_espera'), sb.rpc('panel_cobros'), sb.from('config').select('valor').eq('clave', 'precio').maybeSingle()]);
+  if (d.data) { CONF = d.data.valor; PRECIO = +CONF.mensual }
+  if (a.error) { $('#root').innerHTML = `<p class="empty">No se pudo cargar: ${esc(a.error.message)}</p>`; return }
+  SAL = a.data.map(s => ({ ...s, er: estadoReal(s) })); ESP = b.data || []; COB = c.data || [];
+  render();
+}
+function render() {
+  const n = k => SAL.filter(s => s.er === k).length;
+  const act = n('activo'), pru = n('prueba'), ven = n('vencido') + n('cancelado');
+  const sem = SAL.filter(s => s.er === 'prueba' && dias(s.prueba_hasta) <= 3 || s.er === 'activo' && s.plan_hasta && dias(s.plan_hasta) <= 7).length;
+  const nuevos = SAL.filter(s => Date.now() - new Date(s.creado) < 7 * 864e5).length;
+  const list = TAB === 'espera' ? [] : SAL.filter(s => TAB === 'todas' || (TAB === 'vencen' ? (s.er === 'prueba' && dias(s.prueba_hasta) <= 3 || s.er === 'activo' && s.plan_hasta && dias(s.plan_hasta) <= 7) : TAB === 'vencido' ? (s.er === 'vencido' || s.er === 'cancelado') : s.er === TAB));
+  const tabs = [['todas', `Todas (${SAL.length})`], ['prueba', `En prueba (${pru})`], ['activo', `Activas (${act})`], ['vencen', `Por vencer (${sem})`], ['vencido', `Vencidas (${ven})`], ['espera', `Lista de espera (${ESP.length})`]];
+  $('#root').innerHTML = `<header><h1>Peineta <small>· panel</small></h1><button id="rf">Actualizar</button><button id="out">Salir</button></header>
+  <div class="kpis">
+    <div class="kpi hl"><b>${money(cobradoMes())}</b><span>cobrado este mes con Mercado Pago</span></div>
+    <div class="kpi"><b>${money(act * PRECIO)}</b><span>ingreso mensual esperado (${act} activas)</span></div>
+    <div class="kpi"><b>${pru}</b><span>en prueba</span></div>
+    <div class="kpi"><b>${nuevos}</b><span>registros últimos 7 días</span></div>
+    <div class="kpi"><b>${SAL.length ? Math.round(act / SAL.length * 100) : 0}%</b><span>pasaron a pago</span></div>
+  </div>
+  <div class="tabs">${tabs.map(([k, t]) => `<button data-t="${k}" class="${TAB === k ? 'on' : ''}">${t}</button>`).join('')}</div>
+  ${TAB === 'espera' ? vEspera() : list.length ? list.map(vSalon).join('') : '<p class="empty">No hay peluquerías en esta lista.</p>'}
+  ${COB.length ? `<h3 style="margin:18px 0 8px;font-size:15px">Cobros por mes</h3><div class="card">${COB.map(m => `<div class="top" style="padding:4px 0"><div class="grow">${new Date(m.mes + 'T12:00').toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })}</div><span class="s">${m.cobros} cobros</span>&nbsp;&nbsp;<b>${money(m.total)}</b></div>`).join('')}</div>` : ''}
+  <h3 style="margin:18px 0 8px;font-size:15px">Precio</h3>
+  <div class="card"><div class="top" style="align-items:center;gap:10px;flex-wrap:wrap"><span>$</span><input id="pr" type="number" min="1000" step="100" value="${PRECIO}" style="font:inherit;width:120px;padding:8px;border:1px solid var(--line);border-radius:10px"><span class="s">por mes</span>
+  <label class="s" style="display:flex;gap:6px;align-items:center"><input id="pl" type="checkbox" ${CONF.lanzamiento && CONF.lanzamiento.activo ? 'checked' : ''}> Mostrar "precio de lanzamiento"</label><button id="prg" class="pri">Guardar</button></div>
+  <p class="note">Cambia el precio en la landing, la app y los Términos, y lo que se cobra a las peluquerías que se suscriban desde ahora. Las que ya pagan siguen con su precio.</p></div>
+  <p class="note">"Cobrado" son los pagos aprobados por Mercado Pago. "Esperado" es peluquerías activas × ${money(PRECIO)}.</p>`;
+  document.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { TAB = b.dataset.t; render() });
+  $('#prg').onclick = async () => { const n = Math.round(+$('#pr').value); if (!(n >= 1000)) return alert('Revisá el precio'); if (!confirm(`¿Cambiar el precio a ${money(n)} por mes para las suscripciones nuevas?`)) return; const { error } = await sb.rpc('panel_set_precio', { p_mensual: n, p_lanzamiento: $('#pl').checked }); if (error) alert('No se pudo guardar: ' + error.message); else load() };
+  $('#rf').onclick = load; $('#out').onclick = async () => { await sb.auth.signOut(); vLogin() };
+}
+function cobradoMes() { const m = new Date(); const k = new Date(m.getFullYear(), m.getMonth(), 1).toISOString().slice(0, 7); const r = COB.find(x => String(x.mes).slice(0, 7) === k); return r ? +r.total : 0 }
+function wa(tel, txt) { const t = String(tel || '').replace(/\D/g, ''); if (!t) return ''; const n = t.startsWith('54') ? t : '549' + t.replace(/^0/, ''); return `<a class="btn" target="_blank" rel="noopener" href="https://wa.me/${n}?text=${encodeURIComponent(txt)}">WhatsApp</a>` }
+function vSalon(s) {
+  const lbl = { prueba: 'Prueba', activo: 'Activa', vencido: 'Vencida', cancelado: 'Baja' }[s.er] || s.er;
+  const fin = s.er === 'prueba' ? `Prueba hasta el ${fecha(s.prueba_hasta)} · ${Math.max(0, dias(s.prueba_hasta))} días` : s.er === 'activo' ? `Pagado hasta el ${fecha(s.plan_hasta)} · ${dias(s.plan_hasta)} días` : s.plan_hasta ? `Venció el ${fecha(s.plan_hasta)}` : `Prueba terminó el ${fecha(s.prueba_hasta)}`;
+  const frio = s.er === 'prueba' && s.clientes < 5 && Date.now() - new Date(s.creado) > 864e5;
+  return `<div class="card"><div class="top"><div class="grow"><div class="t">${esc(s.peluqueria || 'Sin nombre')}</div><div class="s">${esc(s.dueno || '')}${s.dueno ? ' · ' : ''}${esc(s.mail)}</div></div><span class="chip c-${s.er}">${lbl}</span></div>
+  <div class="s" style="margin-top:6px">${fin} · se registró el ${fecha(s.creado)} · último ingreso ${hace(s.ultimo_ingreso)}</div>
+  <div class="nums"><span><b>${s.clientes}</b> clientes</span><span><b>${s.turnos}</b> turnos</span><span><b>${s.visitas}</b> cobros</span><span><b>${s.visitas_7d}</b> cobros esta semana</span></div>
+  ${s.mp_estado || +s.pagado_total ? `<div class="s" style="margin-top:6px">Mercado Pago: ${{ authorized: 'pago automático activo', pending: 'abrió el pago pero no lo terminó', cancelled: 'suscripción cancelada', paused: 'suscripción pausada' }[s.mp_estado] || s.mp_estado || '—'} · nos pagó ${money(s.pagado_total)} en total</div>` : ''}
+  ${frio ? '<div class="s alert" style="margin-top:6px">Casi no cargó clientes: conviene escribirle y ofrecer ayuda.</div>' : ''}
+  <div class="acts">${wa(s.telefono, `Hola${s.dueno ? ' ' + s.dueno : ''}! Te escribo de Peineta. ¿Cómo te está yendo con la app? Si querés, te ayudo a cargar tus clientes.`)}<a class="btn" href="mailto:${esc(s.mail)}">Mail</a></div></div>`;
+}
+function vEspera() {
+  if (!ESP.length) return '<p class="empty">Nadie se anotó todavía en la lista de espera.</p>';
+  return ESP.map(p => `<div class="card"><div class="top"><div class="grow"><div class="t">${esc(p.salon || 'Sin nombre')}</div><div class="s">${esc(p.nombre || '')}${p.ciudad ? ' · ' + esc(p.ciudad) : ''}${p.tipo ? ' · ' + esc(p.tipo) : ''}</div></div><span class="s">${fecha(p.creado)}</span></div>
+  <div class="acts">${wa(p.whatsapp, `Hola${p.nombre ? ' ' + p.nombre : ''}! Te escribo de Peineta, te anotaste en la lista de espera. Ya podés probar la app 7 días gratis.`)}</div></div>`).join('');
+}
+load();
+</script>
+</body>
+</html>
